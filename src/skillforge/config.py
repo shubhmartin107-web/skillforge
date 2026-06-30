@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
+from typing import Any
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings
 
 
@@ -16,6 +19,7 @@ class Settings(BaseSettings):
     execution_timeout: int = 120
     max_memory_mb: int = 512
     sandbox_enabled: bool = True
+    sandbox_mode: str = "auto"
     network_enabled: bool = False
     deepseek_api_key: str | None = None
     gemini_api_key: str | None = None
@@ -24,6 +28,25 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     dashboard_host: str = "127.0.0.1"
     dashboard_port: int = 7860
+    server_api_keys: list[str] = []
+    community_registry_url: str = "https://community.skillforge.ai"
+
+    @field_validator("server_api_keys", mode="before")
+    @classmethod
+    def parse_server_api_keys(cls, v: Any) -> list[str]:
+        if isinstance(v, str):
+            if v.startswith("[") and v.endswith("]"):
+                return json.loads(v)
+            return [k.strip() for k in v.split(",") if k.strip()]
+        return v or []
+
+    @field_validator("sandbox_mode")
+    @classmethod
+    def validate_sandbox_mode(cls, v: str) -> str:
+        allowed = {"auto", "wasm", "subprocess"}
+        if v not in allowed:
+            raise ValueError(f"sandbox_mode must be one of: {', '.join(allowed)}")
+        return v
 
     @property
     def registry_path(self) -> Path:

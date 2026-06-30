@@ -10,7 +10,6 @@ import httpx
 import yaml
 
 from skillforge.models.skill import SkillManifest
-from skillforge.models.registry import RegistryEntry
 
 
 class RemoteRegistry:

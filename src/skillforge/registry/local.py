@@ -45,12 +45,17 @@ class LocalRegistry:
                 entrypoint TEXT DEFAULT '',
                 execution_mode TEXT DEFAULT 'direct',
                 size_bytes INTEGER DEFAULT 0,
+                downloads INTEGER DEFAULT 0,
                 PRIMARY KEY (name, version)
             );
             CREATE INDEX IF NOT EXISTS idx_skills_name ON skills(name);
             CREATE INDEX IF NOT EXISTS idx_skills_tags ON skills(tags);
             CREATE INDEX IF NOT EXISTS idx_skills_categories ON skills(categories);
         """)
+        try:
+            self.conn.execute("ALTER TABLE skills ADD COLUMN downloads INTEGER DEFAULT 0")
+        except sqlite3.OperationalError:
+            pass
 
     def install(self, entry: RegistryEntry) -> None:
         data = entry.to_dict()
@@ -59,18 +64,19 @@ class LocalRegistry:
         data["tags"] = json.dumps(data.get("tags", []))
         data["categories"] = json.dumps(data.get("categories", []))
         data["dependencies"] = json.dumps(data.get("dependencies", []))
+        data.setdefault("downloads", 0)
 
         self.conn.execute("""
             INSERT OR REPLACE INTO skills
                 (name, version, description, author_name, tags, categories,
                  installed_at, updated_at, source, source_url,
                  manifest_path, skill_path, dependencies, entrypoint,
-                 execution_mode, size_bytes)
+                 execution_mode, size_bytes, downloads)
             VALUES
                 (:name, :version, :description, :author_name, :tags, :categories,
                  :installed_at, :updated_at, :source, :source_url,
                  :manifest_path, :skill_path, :dependencies, :entrypoint,
-                 :execution_mode, :size_bytes)
+                 :execution_mode, :size_bytes, :downloads)
         """, data)
         self.conn.commit()
 
@@ -205,7 +211,21 @@ class LocalRegistry:
             entrypoint=row["entrypoint"],
             execution_mode=row["execution_mode"],
             size_bytes=row["size_bytes"],
+            downloads=row["downloads"] if "downloads" in row.keys() else 0,
         )
+
+    def increment_downloads(self, name: str, version: str | None = None) -> None:
+        if version:
+            self.conn.execute(
+                "UPDATE skills SET downloads = downloads + 1 WHERE name = ? AND version = ?",
+                (name, version),
+            )
+        else:
+            self.conn.execute(
+                "UPDATE skills SET downloads = downloads + 1 WHERE name = ? ORDER BY installed_at DESC LIMIT 1",
+                (name,),
+            )
+        self.conn.commit()
 
     def close(self) -> None:
         if self._conn:

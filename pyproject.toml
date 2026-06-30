@@ -83,6 +83,7 @@ deepseek = ["openai>=1.0.0"]
 gemini = ["google-genai>=0.1.0"]
 groq = ["groq>=0.8.0"]
 ollama = ["ollama>=0.2.0"]
+wasm = ["wasmtime>=15.0.0"]
 all = [
     "skillforge[dev]",
     "skillforge[dashboard]",
@@ -91,6 +92,7 @@ all = [
     "skillforge[groq]",
     "skillforge[ollama]",
     "skillforge[server]",
+    "skillforge[wasm]",
 ]
 
 [tool.setuptools.package-dir]

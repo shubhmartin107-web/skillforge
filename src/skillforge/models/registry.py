@@ -23,6 +23,7 @@ class RegistryEntry(BaseModel):
     entrypoint: str = ""
     execution_mode: str = "direct"
     size_bytes: int = 0
+    downloads: int = 0
 
     def to_dict(self) -> dict[str, Any]:
         return self.model_dump(exclude_none=True)

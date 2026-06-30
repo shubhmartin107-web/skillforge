@@ -297,12 +297,12 @@ ruff check src/
 - [x] CLI, Python SDK, and Gradio dashboard
 - [x] LLM providers (DeepSeek, Gemini, Groq, Ollama)
 - [x] Permission system and audit logging
-- [ ] Remote registry (package index server)
-- [ ] Skill publishing workflow (build, sign, publish)
-- [ ] WebAssembly-based sandbox for higher isolation
-- [ ] Auto-generated OpenAPI specs from skills
-- [ ] VS Code extension for skill development
-- [ ] Community skill repository
+- [x] Remote registry (package index server) — FastAPI server with auth, upload, download tracking
+- [x] Skill publishing workflow — CLI `publish` command + GitHub Actions workflow
+- [x] WebAssembly-based sandbox for higher isolation — WasmSandbox with wasmtime/wasmer fallback
+- [x] Auto-generated OpenAPI specs from skills — CLI `skill openapi` command, YAML/JSON output
+- [x] VS Code extension for skill development — Full extension at `vscode-extension/`
+- [x] Community skill repository — CommunityRegistry client, CLI discover/install/submit
 
 ## License
 

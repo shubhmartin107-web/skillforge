@@ -4,10 +4,8 @@ from pathlib import Path
 
 import typer
 from rich.console import Console
-from rich.syntax import Syntax
 
-from skillforge.config import settings
-from skillforge.models.execution import ExecutionMode, ExecutionRequest
+from skillforge.models.execution import ExecutionRequest
 from skillforge.runtime.executor import Executor
 
 skill_app = typer.Typer(help="Create, run, and test skills")
@@ -42,9 +40,9 @@ tags: []
 categories: []
 """)
 
-    (dest / "skill.py").write_text(f"""\
+    (dest / "skill.py").write_text("""\
 def run(message: str) -> dict:
-    return {{"result": f"Received: {{message}}"}}
+    return {"result": f"Received: {message}"}
 """)
 
     (dest / "__init__.py").write_text("")
@@ -65,7 +63,7 @@ def create_skill(
     _create_skill_files(dest, name)
 
     console.print(f"[green]Created skill '{name}' at {dest}[/green]")
-    console.print(f"  [dim]Edit skill.yaml and skill.py, then run:[/dim]")
+    console.print("  [dim]Edit skill.yaml and skill.py, then run:[/dim]")
     console.print(f"  [green]skillforge registry install {dest}[/green]")
 
 
@@ -99,7 +97,7 @@ def run_skill(
             result = executor.execute(req)
     except Exception as e:
         console.print(f"[red]Execution failed: {e}[/red]")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
 
     if result.success:
         console.print("[green]Execution completed successfully[/green]")
@@ -114,9 +112,10 @@ def run_skill(
 def test_skill(
     name: str = typer.Argument(..., help="Skill name"),
 ):
+    import yaml
+
     from skillforge.models.skill import SkillManifest
     from skillforge.registry.local import LocalRegistry
-    import yaml
 
     reg = LocalRegistry()
     entry = reg.get(name)
@@ -170,8 +169,9 @@ def test_skill(
 def validate_skill(
     path: str = typer.Argument(..., help="Path to skill directory or manifest"),
 ):
-    from skillforge.models.skill import SkillManifest
     import yaml
+
+    from skillforge.models.skill import SkillManifest
 
     skill_path = Path(path)
     if skill_path.is_dir():
@@ -200,4 +200,29 @@ def validate_skill(
         console.print(f"  Permissions: network={manifest.permissions.network}, dangerous={manifest.permissions.dangerous}")
     except Exception as e:
         console.print(f"[red]✗ Invalid manifest: {e}[/red]")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
+
+
+@skill_app.command("openapi")
+def openapi_command(
+    name: str = typer.Argument(..., help="Skill name or path to skill.yaml"),
+    output: str | None = typer.Option(None, "--output", "-o", help="Output file path"),
+    format: str = typer.Option("yaml", "--format", "-f", help="Output format: yaml or json"),
+):
+    from skillforge.runtime.openapi import generate_openapi_json, generate_openapi_yaml
+
+    path_or_name: str | Path = Path(name) if Path(name).exists() else name
+
+    try:
+        if format == "json":
+            result = generate_openapi_json(path_or_name, output_file=output)
+        else:
+            result = generate_openapi_yaml(path_or_name, output_file=output)
+
+        if output:
+            console.print(f"[green]OpenAPI spec written to {output}[/green]")
+        else:
+            console.print(result)
+    except Exception as e:
+        console.print(f"[red]Failed to generate OpenAPI spec: {e}[/red]")
+        raise typer.Exit(1) from e

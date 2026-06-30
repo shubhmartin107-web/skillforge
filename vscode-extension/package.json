@@ -1,0 +1,169 @@
+{
+  "name": "skillforge-vscode",
+  "displayName": "SkillForge",
+  "description": "Develop, test, and manage SkillForge agent skills",
+  "version": "0.1.0",
+  "publisher": "skillforge",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets",
+    "Other"
+  ],
+  "keywords": [
+    "skillforge",
+    "agent",
+    "skills",
+    "AI"
+  ],
+  "activationEvents": [
+    "onLanguage:skillforge-yaml",
+    "onCommand:skillforge.scaffoldSkill",
+    "onCommand:skillforge.runSkill",
+    "onCommand:skillforge.validateSkill",
+    "onCommand:skillforge.installSkill",
+    "onCommand:skillforge.publishSkill",
+    "onCommand:skillforge.listSkills",
+    "onCommand:skillforge.openDashboard",
+    "onCommand:skillforge.generateOpenApi"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "skillforge.scaffoldSkill",
+        "title": "SkillForge: Scaffold New Skill"
+      },
+      {
+        "command": "skillforge.runSkill",
+        "title": "SkillForge: Run Skill"
+      },
+      {
+        "command": "skillforge.validateSkill",
+        "title": "SkillForge: Validate Skill"
+      },
+      {
+        "command": "skillforge.installSkill",
+        "title": "SkillForge: Install Skill"
+      },
+      {
+        "command": "skillforge.publishSkill",
+        "title": "SkillForge: Publish Skill"
+      },
+      {
+        "command": "skillforge.listSkills",
+        "title": "SkillForge: List Installed Skills"
+      },
+      {
+        "command": "skillforge.openDashboard",
+        "title": "SkillForge: Open Dashboard"
+      },
+      {
+        "command": "skillforge.generateOpenApi",
+        "title": "SkillForge: Generate OpenAPI Spec"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "skillforge.scaffoldSkill",
+        "key": "ctrl+shift+s",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "skillforge.runSkill",
+        "key": "ctrl+shift+r",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "skillforge.validateSkill",
+        "key": "ctrl+shift+v",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "skillforge.listSkills",
+        "key": "ctrl+shift+l",
+        "when": "editorTextFocus"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "skillforge.validateSkill",
+          "when": "editorLangId == skillforge-yaml",
+          "group": "skillforge"
+        },
+        {
+          "command": "skillforge.generateOpenApi",
+          "when": "editorLangId == skillforge-yaml",
+          "group": "skillforge"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "skillforge.scaffoldSkill",
+          "when": "explorerResourceIsFolder",
+          "group": "skillforge"
+        },
+        {
+          "command": "skillforge.installSkill",
+          "when": "explorerResourceIsFolder",
+          "group": "skillforge"
+        }
+      ]
+    },
+    "languages": [
+      {
+        "id": "skillforge-yaml",
+        "aliases": ["SkillForge YAML", "skillforge-yaml"],
+        "filenamePatterns": ["skill.yaml", "skill.yml"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "skillforge-yaml",
+        "scopeName": "skillforge.yaml.injection",
+        "path": "./syntaxes/skillforge.tmLanguage.json",
+        "injectTo": ["source.yaml"]
+      }
+    ],
+    "snippets": [
+      {
+        "language": "skillforge-yaml",
+        "path": "./snippets/skillforge.json"
+      }
+    ],
+    "configuration": {
+      "title": "SkillForge",
+      "properties": {
+        "skillforge.registryUrl": {
+          "type": "string",
+          "default": "http://localhost:8000",
+          "description": "URL of the SkillForge registry server"
+        },
+        "skillforge.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "API key for registry authentication"
+        },
+        "skillforge.pythonPath": {
+          "type": "string",
+          "default": "python3",
+          "description": "Path to Python interpreter for running SkillForge CLI"
+        }
+      }
+    }
+  },
+  "main": "./out/extension.js",
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -w -p ./"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0"
+  }
+}

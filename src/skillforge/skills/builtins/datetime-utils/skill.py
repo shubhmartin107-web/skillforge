@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 
 def datetime_operation(
@@ -29,7 +29,7 @@ def datetime_operation(
 
 
 def _now(**kwargs) -> dict:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     return {
         "result": now.strftime(kwargs.get("fmt", "%Y-%m-%d %H:%M:%S")),
         "timestamp": now.timestamp(),
@@ -64,7 +64,7 @@ def _parse_date(**kwargs) -> dict:
 def _date_diff(**kwargs) -> dict:
     try:
         dt1 = datetime.strptime(kwargs["date_string"], kwargs["input_fmt"])
-        dt2 = datetime.now(timezone.utc).replace(tzinfo=None)
+        dt2 = datetime.now(UTC).replace(tzinfo=None)
         diff = dt2 - dt1
         return {
             "result": str(diff),

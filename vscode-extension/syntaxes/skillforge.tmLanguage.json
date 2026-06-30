@@ -1,0 +1,76 @@
+{
+  "scopeName": "skillforge.yaml.injection",
+  "injectionSelector": "L:source.yaml",
+  "fileTypes": [],
+  "name": "skillforge.yaml.injection",
+  "patterns": [
+    {
+      "include": "#skillforge-keywords"
+    },
+    {
+      "include": "#skillforge-types"
+    },
+    {
+      "include": "#skillforge-string-values"
+    }
+  ],
+  "repository": {
+    "skillforge-keywords": {
+      "patterns": [
+        {
+          "match": "(?<=^|\\s)(name|version|schema_version|description|author)\\s*:",
+          "name": "entity.name.tag.skillforge"
+        },
+        {
+          "match": "(?<=^|\\s)(inputs|outputs|dependencies|permissions|execution)\\s*:",
+          "name": "entity.name.section.skillforge"
+        },
+        {
+          "match": "(?<=^|\\s)(mode|entrypoint|function|runtime)\\s*:",
+          "name": "keyword.control.skillforge"
+        },
+        {
+          "match": "(?<=^|\\s)(tags|categories)\\s*:",
+          "name": "entity.other.attribute-name.skillforge"
+        },
+        {
+          "match": "(?<=^|\\s)(network|dangerous|filesystem_read|filesystem_write|env_vars)\\s*:",
+          "name": "keyword.other.permission.skillforge"
+        }
+      ]
+    },
+    "skillforge-types": {
+      "patterns": [
+        {
+          "match": "(?<=^\\s+-\\s+type:\\s)(string|integer|float|boolean|list|object|any)\\b",
+          "name": "storage.type.skillforge"
+        },
+        {
+          "match": "(?<=^\\s+type:\\s)(string|integer|float|boolean|list|object|any)\\b",
+          "name": "storage.type.skillforge"
+        }
+      ]
+    },
+    "skillforge-string-values": {
+      "patterns": [
+        {
+          "begin": "\"",
+          "end": "\"",
+          "name": "string.quoted.double.skillforge",
+          "patterns": [
+            {
+              "match": "\\\\.",
+              "name": "constant.character.escape.skillforge"
+            }
+          ]
+        },
+        {
+          "begin": "'",
+          "end": "'",
+          "name": "string.quoted.single.skillforge"
+        }
+      ]
+    }
+  },
+  "uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+}

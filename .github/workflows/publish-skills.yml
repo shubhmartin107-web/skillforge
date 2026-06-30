@@ -1,0 +1,30 @@
+name: Publish Skills
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "skills/**"
+      - "examples/**"
+  workflow_dispatch:
+    inputs:
+      skill_path:
+        description: "Path to skill directory"
+        required: true
+        default: "examples/hello-world"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install SkillForge
+        run: pip install skillforge
+      - name: Publish skill
+        run: |
+          skillforge registry publish ${{ github.event.inputs.skill_path || 'skills/*' }} \
+            --registry-url ${{ secrets.SKILLFORGE_REGISTRY_URL }} \
+            --api-key ${{ secrets.SKILLFORGE_API_KEY }}

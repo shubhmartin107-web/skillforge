@@ -60,7 +60,6 @@ class ConditionNode(BaseNode):
     false_branch: str
 
     def evaluate(self, context: dict[str, Any]) -> str:
-        import re
 
         expr = self.condition
         for key, value in context.items():

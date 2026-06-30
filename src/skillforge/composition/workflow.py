@@ -5,7 +5,14 @@ from typing import Any
 
 import yaml
 
-from skillforge.composition.nodes import BaseNode, ConditionNode, MapNode, MergeNode, NodeType, SkillNode
+from skillforge.composition.nodes import (
+    BaseNode,
+    ConditionNode,
+    MapNode,
+    MergeNode,
+    NodeType,
+    SkillNode,
+)
 from skillforge.models.execution import ExecutionRequest, ExecutionStatus
 from skillforge.runtime.executor import Executor
 from skillforge.runtime.hooks import ExecutionHooks

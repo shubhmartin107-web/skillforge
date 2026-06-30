@@ -1,16 +1,14 @@
 from __future__ import annotations
 
 import json
-import os
 import shutil
 from pathlib import Path
-from typing import Any
 
 import yaml
 
 from skillforge.config import settings
 from skillforge.models.registry import RegistryEntry
-from skillforge.models.skill import SkillManifest, SkillDependency
+from skillforge.models.skill import SkillDependency, SkillManifest
 from skillforge.registry.local import LocalRegistry
 from skillforge.registry.resolver import DependencyResolver
 

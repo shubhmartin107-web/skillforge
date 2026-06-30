@@ -1,0 +1,99 @@
+{
+  "skill-skeleton": {
+    "prefix": "skillforge-skeleton",
+    "body": [
+      "name: ${1:skill-name}",
+      "version: ${2:0.1.0}",
+      "description: \"${3:A SkillForge skill}\"",
+      "",
+      "author:",
+      "  name: \"${4:Your Name}\"",
+      "  contact: \"${5}\"",
+      "",
+      "inputs:",
+      "  - name: ${6:input_name}",
+      "    type: ${7:string}",
+      "    description: \"${8:Input description}\"",
+      "    required: ${9:true}",
+      "",
+      "outputs:",
+      "  - name: ${10:output_name}",
+      "    type: ${11:string}",
+      "    description: \"${12:Output description}\"",
+      "",
+      "permissions:",
+      "  network: ${13:false}",
+      "  filesystem_read: ${14:[]}",
+      "  filesystem_write: ${15:[]}",
+      "",
+      "execution:",
+      "  mode: ${16:direct}",
+      "  entrypoint: ${17:skill.py}",
+      "  function: ${18:run}",
+      "  runtime: ${19:python3.12}",
+      "",
+      "tags: [${20}]",
+      "categories: [${21}]"
+    ],
+    "description": "Complete skill.yaml scaffold with all fields"
+  },
+  "skill-input": {
+    "prefix": "skillforge-input",
+    "body": [
+      "- name: ${1:input_name}",
+      "  type: ${2:string}",
+      "  description: \"${3:Input description}\"",
+      "  required: ${4:true}",
+      "  default: ${5:null}"
+    ],
+    "description": "Add an input definition"
+  },
+  "skill-output": {
+    "prefix": "skillforge-output",
+    "body": [
+      "- name: ${1:output_name}",
+      "  type: ${2:string}",
+      "  description: \"${3:Output description}\""
+    ],
+    "description": "Add an output definition"
+  },
+  "skill-permission": {
+    "prefix": "skillforge-permissions",
+    "body": [
+      "permissions:",
+      "  network: ${1:false}",
+      "  dangerous: ${2:false}",
+      "  filesystem_read: ${3:[]}",
+      "  filesystem_write: ${4:[]}",
+      "  env_vars: ${5:[]}"
+    ],
+    "description": "Add permission block"
+  },
+  "skill-dependency": {
+    "prefix": "skillforge-dependency",
+    "body": [
+      "dependencies:",
+      "  - name: ${1:dep_name}",
+      "    version: ${2:>=1.0.0}",
+      "    source: ${3:registry}"
+    ],
+    "description": "Add dependency entry"
+  },
+  "skill-python-run": {
+    "prefix": "skillforge-python-run",
+    "body": [
+      "def ${1:run}(${2:input_name}: ${3:str}) -> dict:",
+      "    \"\"\"Execute the skill.",
+      "",
+      "    Args:",
+      "        ${2:input_name}: The input parameter.",
+      "",
+      "    Returns:",
+      "        dict: The skill output.",
+      "    \"\"\"",
+      "    result = ${4:f\"Received: {${2:input_name}}\"}",
+      "    return {\"${5:output_name}\": ${6:result}}"
+    ],
+    "description": "Basic skill.py run function"
+  }
+}

@@ -5,8 +5,9 @@ def http_request(
     body: str = "",
     timeout: int = 30,
 ) -> dict:
-    import httpx
     import time
+
+    import httpx
 
     headers = headers or {}
     start = time.time()

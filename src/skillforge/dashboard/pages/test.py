@@ -28,8 +28,9 @@ def create_test_page():
             return "{}", ""
 
         manifest_path = entry.manifest_path
-        import yaml
         from pathlib import Path
+
+        import yaml
         p = Path(manifest_path)
         if p.exists():
             raw = yaml.safe_load(p.read_text("utf-8"))

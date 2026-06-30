@@ -3,7 +3,6 @@ from __future__ import annotations
 import typer
 from rich.console import Console
 from rich.panel import Panel
-from rich.table import Table
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
 from skillforge import __version__
@@ -18,9 +17,9 @@ app = typer.Typer(
 )
 console = Console()
 
+from skillforge.cli.config_cmds import config_app
 from skillforge.cli.registry_cmds import registry_app
 from skillforge.cli.skill_cmds import skill_app
-from skillforge.cli.config_cmds import config_app
 from skillforge.cli.workflow_cmds import workflow_app
 
 app.add_typer(registry_app, name="registry", help="Manage skill registry")
@@ -47,8 +46,8 @@ def install_completions(
         autocompletion=lambda: ["bash", "zsh", "fish", "powershell"],
     ),
 ):
-    from pathlib import Path
-    import subprocess, sys
+    import subprocess
+    import sys
 
     try:
         result = subprocess.run(

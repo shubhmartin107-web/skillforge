@@ -7,11 +7,17 @@ from pathlib import Path
 from typing import Any
 
 from skillforge.config import settings
-from skillforge.models.execution import ExecutionMode, ExecutionRequest, ExecutionResult, ExecutionStatus
+from skillforge.models.execution import (
+    ExecutionMode,
+    ExecutionRequest,
+    ExecutionResult,
+    ExecutionStatus,
+)
 from skillforge.models.skill import SkillManifest
 from skillforge.registry.local import LocalRegistry
 from skillforge.runtime.hooks import ExecutionHooks
 from skillforge.runtime.sandbox import Sandbox
+from skillforge.runtime.wasm_sandbox import WasmSandbox
 
 
 class Executor:
@@ -176,7 +182,9 @@ class Executor:
 
             hooks.start(skill_name=request.skill_name, mode="sandboxed")
 
-            with Sandbox(
+            use_wasm = settings.sandbox_mode in ("auto", "wasm")
+            sandbox_cls: type[Sandbox | WasmSandbox] = WasmSandbox if use_wasm else Sandbox
+            with sandbox_cls(
                 permissions=permissions,
                 timeout=request.timeout or settings.execution_timeout,
                 network_enabled=permissions.network,

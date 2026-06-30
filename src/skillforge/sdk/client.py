@@ -211,8 +211,8 @@ class _SkillRegistrar:
         tmp = Path(tempfile.mkdtemp(prefix="skillforge_inline_"))
         import yaml
         (tmp / "skill.yaml").write_text(yaml.dump(manifest.to_yaml_dict(), default_flow_style=False))
-        import textwrap
         import re
+        import textwrap
         try:
             source = textwrap.dedent(inspect.getsource(func))
             def_line = re.search(r'^def\s', source, re.MULTILINE)

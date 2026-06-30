@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 from skillforge.config import settings
+from skillforge.dashboard.pages.audit import create_audit_page
 from skillforge.dashboard.pages.browse import create_browse_page
 from skillforge.dashboard.pages.inspect import create_inspect_page
+from skillforge.dashboard.pages.stats import create_stats_page
 from skillforge.dashboard.pages.test import create_test_page
 from skillforge.dashboard.pages.workflows import create_workflows_page
-from skillforge.dashboard.pages.stats import create_stats_page
-from skillforge.dashboard.pages.audit import create_audit_page
 
 
 def create_app():

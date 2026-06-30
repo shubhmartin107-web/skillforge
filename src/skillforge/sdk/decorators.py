@@ -4,8 +4,8 @@ import inspect
 import re
 import tempfile
 import textwrap
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable
 
 from skillforge.models.skill import SkillInput, SkillManifest
 from skillforge.registry.installer import Installer
