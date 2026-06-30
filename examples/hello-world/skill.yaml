@@ -1,0 +1,39 @@
+name: hello-world
+version: 1.0.0
+description: "A simple greeting skill — the Hello World of agent skills"
+
+author:
+  name: "SkillForge Team"
+  contact: "team@skillforge.ai"
+
+inputs:
+  - name: name
+    type: string
+    description: "Name of the person to greet"
+    required: true
+  - name: greeting
+    type: string
+    description: "Custom greeting word"
+    default: "Hello"
+
+outputs:
+  - name: message
+    type: string
+    description: "The greeting message"
+  - name: length
+    type: integer
+    description: "Length of the message"
+
+permissions:
+  network: false
+  filesystem_read: []
+  filesystem_write: []
+
+execution:
+  mode: direct
+  entrypoint: skill.py
+  function: run
+  runtime: python3.12
+
+tags: ["example", "hello", "tutorial"]
+categories: ["utility", "demo"]

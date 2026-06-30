@@ -1,0 +1,54 @@
+name: http-client
+version: 1.0.0
+description: "Makes HTTP requests and returns response data"
+
+author:
+  name: "SkillForge Builtins"
+
+inputs:
+  - name: url
+    type: string
+    description: "Request URL"
+    required: true
+  - name: method
+    type: string
+    description: "HTTP method: GET, POST, PUT, DELETE"
+    default: "GET"
+  - name: headers
+    type: object
+    description: "Request headers as JSON object"
+    default: {}
+  - name: body
+    type: string
+    description: "Request body (for POST/PUT)"
+    default: ""
+  - name: timeout
+    type: integer
+    description: "Request timeout in seconds"
+    default: 30
+
+outputs:
+  - name: status_code
+    type: integer
+    description: "HTTP status code"
+  - name: body
+    type: string
+    description: "Response body (truncated to 10000 chars)"
+  - name: headers
+    type: object
+    description: "Response headers"
+  - name: elapsed_ms
+    type: integer
+    description: "Request duration in milliseconds"
+
+permissions:
+  network: true
+  env_vars: ["HTTP_PROXY", "HTTPS_PROXY"]
+
+execution:
+  mode: direct
+  entrypoint: skill.py
+  function: http_request
+
+tags: ["http", "network", "api", "builtin"]
+categories: ["networking"]

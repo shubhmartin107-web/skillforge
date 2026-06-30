@@ -1,0 +1,39 @@
+name: echo
+version: 1.0.0
+description: "Echoes back the input message — useful for testing pipelines"
+
+author:
+  name: "SkillForge Builtins"
+
+inputs:
+  - name: message
+    type: string
+    description: "The message to echo back"
+    required: true
+  - name: uppercase
+    type: boolean
+    description: "Convert to uppercase"
+    default: false
+  - name: prefix
+    type: string
+    description: "Optional prefix"
+    default: ""
+
+outputs:
+  - name: result
+    type: string
+    description: "The echoed message"
+  - name: length
+    type: integer
+    description: "Length of the result"
+
+permissions:
+  network: false
+
+execution:
+  mode: direct
+  entrypoint: skill.py
+  function: echo
+
+tags: ["utility", "test", "builtin"]
+categories: ["utility"]

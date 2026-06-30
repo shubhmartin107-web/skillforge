@@ -1,0 +1,44 @@
+name: research-assistant
+version: 0.1.0
+description: "Searches for a topic, fetches content, and analyzes it"
+start_node: search
+
+nodes:
+  search:
+    type: skill
+    id: search
+    skill_name: web-page-fetcher
+    description: "Fetches a web page about the topic"
+    inputs:
+      url: "{workflow.inputs.topic}"
+      extract_links: true
+      max_chars: 3000
+    next_on_success: analyze
+    next_on_failure: fallback
+
+  analyze:
+    type: skill
+    id: analyze
+    skill_name: data-analyzer
+    description: "Analyzes the content"
+    inputs:
+      numbers: "{steps.search.result.content}"
+      include_histogram: false
+    next_on_success: summarize
+
+  summarize:
+    type: condition
+    id: summarize
+    description: "Check if analysis was successful"
+    condition: "{steps.analyze.status} == 'completed'"
+    true_branch: success
+    false_branch: fallback
+
+  fallback:
+    type: skill
+    id: fallback
+    skill_name: hello-world
+    description: "Fallback greeting"
+    inputs:
+      name: "{workflow.inputs.topic}"
+      greeting: "Could not analyze"

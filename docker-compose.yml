@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  skillforge:
+    build: .
+    ports:
+      - "7860:7860"
+    volumes:
+      - skillforge_data:/root/.skillforge
+    environment:
+      - SKILLFORGE_DASHBOARD_HOST=0.0.0.0
+      - SKILLFORGE_DASHBOARD_PORT=7860
+      - SKILLFORGE_SANDBOX_ENABLED=true
+
+volumes:
+  skillforge_data:

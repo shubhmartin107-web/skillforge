@@ -1,0 +1,42 @@
+name: template-renderer
+version: 1.0.0
+description: "Renders a template string with variable substitution"
+
+author:
+  name: "SkillForge Builtins"
+
+inputs:
+  - name: template
+    type: string
+    description: "Template string with {placeholders}"
+    required: true
+  - name: variables
+    type: object
+    description: "Variables to substitute"
+    default: {}
+  - name: missing_placeholder
+    type: string
+    description: "What to do with missing placeholders: keep, empty, error"
+    default: "keep"
+
+outputs:
+  - name: result
+    type: string
+    description: "Rendered template"
+  - name: placeholders_found
+    type: integer
+    description: "Number of placeholders found"
+  - name: placeholders_replaced
+    type: integer
+    description: "Number of placeholders replaced"
+
+permissions:
+  network: false
+
+execution:
+  mode: direct
+  entrypoint: skill.py
+  function: render_template
+
+tags: ["template", "string", "utility", "builtin"]
+categories: ["utility"]

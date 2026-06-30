@@ -1,0 +1,28 @@
+---
+name: Feature Request
+about: Suggest an idea for SkillForge
+title: "[FEATURE] "
+labels: enhancement
+assignees: ""
+---
+
+## Problem Statement
+
+A clear and concise description of what problem this feature would solve.
+Ex. "I'm always frustrated when [...]"
+
+## Proposed Solution
+
+A clear and concise description of what you want to happen.
+
+## Alternative Solutions
+
+A clear and concise description of any alternative solutions or features you've considered.
+
+## Impact
+
+How would this feature benefit the SkillForge community?
+
+## Additional Context
+
+Add any other context, references, or examples here.

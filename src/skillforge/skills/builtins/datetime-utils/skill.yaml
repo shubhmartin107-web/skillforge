@@ -1,0 +1,54 @@
+name: datetime-utils
+version: 1.0.0
+description: "Date/time formatting, parsing, and manipulation utilities"
+
+author:
+  name: "SkillForge Builtins"
+
+inputs:
+  - name: operation
+    type: string
+    description: "Operation: now, format, parse, diff, add_days"
+    default: "now"
+  - name: date_string
+    type: string
+    description: "Input date string (for format/parse/diff)"
+    default: ""
+  - name: format
+    type: string
+    description: "Output format (strftime format)"
+    default: "%Y-%m-%d %H:%M:%S"
+  - name: input_format
+    type: string
+    description: "Input format for parsing"
+    default: "%Y-%m-%d"
+  - name: days
+    type: integer
+    description: "Days to add (for add_days)"
+    default: 0
+  - name: timezone
+    type: string
+    description: "Timezone name (e.g., UTC, US/Eastern)"
+    default: "UTC"
+
+outputs:
+  - name: result
+    type: string
+    description: "Operation result"
+  - name: timestamp
+    type: float
+    description: "Unix timestamp"
+  - name: iso_string
+    type: string
+    description: "ISO 8601 formatted datetime"
+
+permissions:
+  network: false
+
+execution:
+  mode: direct
+  entrypoint: skill.py
+  function: datetime_operation
+
+tags: ["datetime", "time", "utility", "builtin"]
+categories: ["utility"]

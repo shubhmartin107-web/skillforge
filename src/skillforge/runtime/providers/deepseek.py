@@ -1,0 +1,63 @@
+from __future__ import annotations
+
+from typing import Any
+
+from skillforge.config import settings
+from skillforge.runtime.providers.base import BaseProvider
+
+
+class DeepSeekProvider(BaseProvider):
+    name = "deepseek"
+
+    def __init__(self, api_key: str | None = None, model: str = "deepseek-chat"):
+        self.api_key = api_key or settings.deepseek_api_key
+        self.model = model
+        self._client = None
+
+    def _get_client(self):
+        if self._client is None:
+            try:
+                from openai import OpenAI
+                self._client = OpenAI(
+                    api_key=self.api_key,
+                    base_url="https://api.deepseek.com",
+                )
+            except ImportError:
+                raise ImportError("openai package required. Install with: pip install openai")
+        return self._client
+
+    def chat(
+        self,
+        messages: list[dict[str, str]],
+        temperature: float = 0.7,
+        max_tokens: int = 1024,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        client = self._get_client()
+        resp = client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            **kwargs,
+        )
+        return {
+            "content": resp.choices[0].message.content,
+            "model": self.model,
+            "usage": resp.usage.model_dump() if resp.usage else None,
+        }
+
+    def generate(
+        self,
+        prompt: str,
+        temperature: float = 0.7,
+        max_tokens: int = 1024,
+        **kwargs: Any,
+    ) -> str:
+        result = self.chat(
+            messages=[{"role": "user", "content": prompt}],
+            temperature=temperature,
+            max_tokens=max_tokens,
+            **kwargs,
+        )
+        return result.get("content", "")

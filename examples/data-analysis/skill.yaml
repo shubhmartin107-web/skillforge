@@ -1,0 +1,53 @@
+name: data-analyzer
+version: 1.0.0
+description: "Analyzes a list of numbers and computes statistics"
+
+author:
+  name: "SkillForge Team"
+
+inputs:
+  - name: numbers
+    type: list
+    description: "List of numbers to analyze"
+    required: true
+  - name: include_histogram
+    type: boolean
+    description: "Generate a simple text histogram"
+    default: false
+
+outputs:
+  - name: count
+    type: integer
+    description: "Number of values"
+  - name: sum
+    type: float
+    description: "Sum of values"
+  - name: mean
+    type: float
+    description: "Arithmetic mean"
+  - name: median
+    type: float
+    description: "Median value"
+  - name: min
+    type: float
+    description: "Minimum value"
+  - name: max
+    type: float
+    description: "Maximum value"
+  - name: std_dev
+    type: float
+    description: "Standard deviation"
+  - name: histogram
+    type: string
+    description: "Text histogram (if requested)"
+
+permissions:
+  network: false
+
+execution:
+  mode: direct
+  entrypoint: skill.py
+  function: analyze
+
+tags: ["data", "analysis", "statistics"]
+categories: ["data-processing"]

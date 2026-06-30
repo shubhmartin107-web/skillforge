@@ -1,0 +1,43 @@
+name: file-reader
+version: 1.0.0
+description: "Reads file contents from the local filesystem"
+
+author:
+  name: "SkillForge Builtins"
+
+inputs:
+  - name: path
+    type: string
+    description: "Path to the file"
+    required: true
+  - name: encoding
+    type: string
+    description: "File encoding"
+    default: "utf-8"
+  - name: max_bytes
+    type: integer
+    description: "Maximum bytes to read"
+    default: 1048576
+
+outputs:
+  - name: content
+    type: string
+    description: "File content"
+  - name: size_bytes
+    type: integer
+    description: "File size in bytes"
+  - name: truncated
+    type: boolean
+    description: "Whether content was truncated"
+
+permissions:
+  network: false
+  filesystem_read: ["*"]
+
+execution:
+  mode: direct
+  entrypoint: skill.py
+  function: read_file
+
+tags: ["file", "filesystem", "utility", "builtin"]
+categories: ["utility"]

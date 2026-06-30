@@ -1,0 +1,45 @@
+name: json-processor
+version: 1.0.0
+description: "Parses, validates, and transforms JSON data"
+
+author:
+  name: "SkillForge Builtins"
+
+inputs:
+  - name: data
+    type: string
+    description: "JSON string to process"
+    required: true
+  - name: query
+    type: string
+    description: "JMESPath query to extract data (optional)"
+    default: ""
+  - name: pretty_print
+    type: boolean
+    description: "Pretty-print the output"
+    default: false
+
+outputs:
+  - name: valid
+    type: boolean
+    description: "Whether the JSON is valid"
+  - name: parsed
+    type: object
+    description: "Parsed JSON data"
+  - name: formatted
+    type: string
+    description: "Formatted JSON string"
+  - name: error
+    type: string
+    description: "Error message if invalid"
+
+permissions:
+  network: false
+
+execution:
+  mode: direct
+  entrypoint: skill.py
+  function: process_json
+
+tags: ["json", "data", "utility", "builtin"]
+categories: ["data-processing"]

@@ -1,0 +1,6 @@
+include README.md
+include LICENSE
+include pyproject.toml
+recursive-include src/skillforge/skills/builtins *.*
+recursive-include docs *
+recursive-include examples *
