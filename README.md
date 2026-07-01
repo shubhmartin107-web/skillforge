@@ -122,6 +122,10 @@ tags: ["web", "utility"]
 categories: ["data-ingestion"]
 ```
 
+See `examples/social-approval-review/` for a no-network manifest and Python
+entrypoint that reviews social media actions before account-affecting workflows
+run through tools such as TweetClaw or OpenClaw plugins.
+
 ## CLI Reference
 
 ```bash
