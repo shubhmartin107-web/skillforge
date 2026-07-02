@@ -1,0 +1,56 @@
+name: social-approval-review
+version: 1.0.0
+description: "Reviews social media action plans against safety, brand, and platform guidelines. No network required."
+
+author:
+  name: "SkillForge Contributors"
+  contact: "https://github.com/shubhmartin107-web/skillforge"
+
+inputs:
+  - name: action_plan
+    type: string
+    description: "The social media post or action plan text to review"
+    required: true
+  - name: platform
+    type: string
+    description: "Target platform: twitter, linkedin, facebook, instagram, or general"
+    required: false
+    default: "general"
+  - name: tone
+    type: string
+    description: "Desired tone: professional, casual, humorous, or neutral"
+    required: false
+    default: "neutral"
+  - name: strictness
+    type: string
+    description: "Review strictness: low, medium, or high"
+    required: false
+    default: "medium"
+
+outputs:
+  - name: approved
+    type: boolean
+    description: "Whether the action plan is approved for publishing"
+  - name: score
+    type: integer
+    description: "Overall quality score (0–100)"
+  - name: issues
+    type: list
+    description: "List of issues found during review"
+  - name: suggestions
+    type: list
+    description: "Actionable improvement suggestions"
+  - name: summary
+    type: string
+    description: "Brief one-line review summary"
+
+permissions:
+  network: false
+
+execution:
+  mode: direct
+  entrypoint: skill.py
+  function: review
+
+tags: ["social-media", "moderation", "compliance", "content-review"]
+categories: ["content-management", "compliance"]

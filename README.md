@@ -122,6 +122,8 @@ tags: ["web", "utility"]
 categories: ["data-ingestion"]
 ```
 
+> **Real-world example:** See [`examples/social-approval-review/`](examples/social-approval-review/) for a no-network skill that reviews social media action plans against safety, brand, and platform guidelines.
+
 ## CLI Reference
 
 ```bash
