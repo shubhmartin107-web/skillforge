@@ -122,7 +122,9 @@ tags: ["web", "utility"]
 categories: ["data-ingestion"]
 ```
 
-> **Real-world example:** See [`examples/social-approval-review/`](examples/social-approval-review/) for a no-network skill that reviews social media action plans against safety, brand, and platform guidelines.
+See `examples/social-approval-review/` for a no-network manifest and Python
+entrypoint that reviews social media actions before account-affecting workflows
+run through tools such as TweetClaw or OpenClaw plugins.
 
 ## CLI Reference
 
