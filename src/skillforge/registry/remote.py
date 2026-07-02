@@ -32,7 +32,7 @@ class RemoteRegistry:
         if isinstance(data, list):
             return data
         if isinstance(data, dict):
-            return data.get("skills", data.get("entries", []))
+            return data.get("skills") or data.get("entries") or []
         return []
 
     def fetch_from_github(self, repo: str, path: str = "") -> list[dict[str, Any]]:

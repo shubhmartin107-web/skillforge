@@ -11,7 +11,7 @@ def create_browse_page():
     stats = reg.stats()
     reg.close()
 
-    def search_skills(query: str, tag: str) -> list[list[str | int]]:
+    def search_skills(query: str, tag: str) -> list[list[str]]:
         reg = LocalRegistry()
         q = SearchQuery(query=query)
         if tag:

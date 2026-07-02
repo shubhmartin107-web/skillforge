@@ -13,7 +13,7 @@ from skillforge.composition.nodes import (
     NodeType,
     SkillNode,
 )
-from skillforge.models.execution import ExecutionRequest, ExecutionStatus
+from skillforge.models.execution import ExecutionMode, ExecutionRequest, ExecutionStatus
 from skillforge.runtime.executor import Executor
 from skillforge.runtime.hooks import ExecutionHooks
 
@@ -58,16 +58,15 @@ class Workflow:
         for nid, node_data in data.get("nodes", {}).items():
             ntype = NodeType(node_data.get("type", "skill"))
             if ntype == NodeType.skill:
-                node = SkillNode(**node_data)
+                wf.nodes[nid] = SkillNode(**node_data)
             elif ntype == NodeType.condition:
-                node = ConditionNode(**node_data)
+                wf.nodes[nid] = ConditionNode(**node_data)
             elif ntype == NodeType.map_node:
-                node = MapNode(**node_data)
+                wf.nodes[nid] = MapNode(**node_data)
             elif ntype == NodeType.merge:
-                node = MergeNode(**node_data)
+                wf.nodes[nid] = MergeNode(**node_data)
             else:
                 raise WorkflowError(f"Unknown node type: {ntype}")
-            wf.nodes[nid] = node
         return wf
 
     @classmethod
@@ -119,7 +118,7 @@ class WorkflowEngine:
                         skill_name=node.skill_name,
                         skill_version=node.skill_version,
                         inputs=resolved_inputs,
-                        mode=node.execution_mode,
+                        mode=ExecutionMode(node.execution_mode),
                         trace_id=hooks.trace_id,
                     )
                     result = self.executor.execute(req, hooks=hooks)

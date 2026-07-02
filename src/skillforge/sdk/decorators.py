@@ -7,7 +7,7 @@ import textwrap
 from collections.abc import Callable
 from pathlib import Path
 
-from skillforge.models.skill import SkillInput, SkillManifest
+from skillforge.models.skill import Permission, SkillInput, SkillManifest
 from skillforge.registry.installer import Installer
 from skillforge.registry.local import LocalRegistry
 
@@ -29,13 +29,13 @@ def skill(
             description=description or func.__doc__ or "",
             inputs=inputs or [],
             outputs=[],
-            permissions={
-                "network": network,
-                "filesystem_read": [],
-                "filesystem_write": [],
-                "env_vars": [],
-                "dangerous": False,
-            },
+            permissions=Permission(
+                network=network,
+                filesystem_read=[],
+                filesystem_write=[],
+                env_vars=[],
+                dangerous=False,
+            ),
             execution={
                 "mode": "direct",
                 "entrypoint": "skill.py",
