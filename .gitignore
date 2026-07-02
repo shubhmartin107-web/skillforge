@@ -48,3 +48,6 @@ coverage.xml
 
 # Gradio
 gradio_cached_examples/
+
+# MkDocs build output
+site/
