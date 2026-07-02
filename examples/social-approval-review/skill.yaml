@@ -1,56 +1,48 @@
 name: social-approval-review
 version: 1.0.0
-description: "Reviews social media action plans against safety, brand, and platform guidelines. No network required."
+description: "Reviews social media action plans before account-affecting operations run"
 
 author:
-  name: "SkillForge Contributors"
-  contact: "https://github.com/shubhmartin107-web/skillforge"
+  name: "SkillForge Community"
 
 inputs:
-  - name: action_plan
+  - name: workflow_summary
     type: string
-    description: "The social media post or action plan text to review"
+    description: "Short description of the planned social media workflow"
     required: true
-  - name: platform
-    type: string
-    description: "Target platform: twitter, linkedin, facebook, instagram, or general"
-    required: false
-    default: "general"
-  - name: tone
-    type: string
-    description: "Desired tone: professional, casual, humorous, or neutral"
-    required: false
-    default: "neutral"
-  - name: strictness
-    type: string
-    description: "Review strictness: low, medium, or high"
-    required: false
-    default: "medium"
+  - name: requested_actions
+    type: list
+    description: "Action labels such as draft, publish, reply, follow, dm, delete, or media_upload"
+    default: []
+  - name: has_human_approval
+    type: boolean
+    description: "Whether a human has explicitly approved state-changing actions"
+    default: false
 
 outputs:
-  - name: approved
-    type: boolean
-    description: "Whether the action plan is approved for publishing"
-  - name: score
-    type: integer
-    description: "Overall quality score (0–100)"
-  - name: issues
-    type: list
-    description: "List of issues found during review"
-  - name: suggestions
-    type: list
-    description: "Actionable improvement suggestions"
-  - name: summary
+  - name: decision
     type: string
-    description: "Brief one-line review summary"
+    description: "approved, needs_changes, or blocked"
+  - name: approval_required
+    type: boolean
+    description: "Whether the requested actions need explicit human approval"
+  - name: actions
+    type: list
+    description: "Normalized account-affecting actions detected"
+  - name: missing_context
+    type: list
+    description: "Minimum missing details needed before execution"
 
 permissions:
   network: false
+  filesystem_read: []
+  filesystem_write: []
 
 execution:
   mode: direct
   entrypoint: skill.py
-  function: review
+  function: run
+  runtime: python3.12
 
-tags: ["social-media", "moderation", "compliance", "content-review"]
-categories: ["content-management", "compliance"]
+tags: ["social-media", "approval", "openclaw", "tweetclaw"]
+categories: ["policy", "safety", "automation"]
