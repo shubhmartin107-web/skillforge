@@ -1,0 +1,64 @@
+site_name: SkillForge
+site_description: Reusable Agent Skills Registry & Runtime
+site_url: https://shubhmartin107-web.github.io/skillforge
+repo_url: https://github.com/shubhmartin107-web/skillforge
+repo_name: shubhmartin107-web/skillforge
+
+theme:
+  name: material
+  icon:
+    logo: fontawesome/solid/gears
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.expand
+    - navigation.indexes
+    - content.code.annotate
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - Skill Standard: skill-standard.md
+  - Architecture: architecture.md
+  - Registry: registry.md
+  - Runtime: runtime.md
+  - Composition: composition.md
+  - Security: security.md
+  - API Reference: api.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.snippets
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/shubhmartin107-web/skillforge
