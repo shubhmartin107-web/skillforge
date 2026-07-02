@@ -89,6 +89,7 @@ def install_skill(
         raise typer.Exit(1)
 
     from skillforge.registry.installer import Installer
+
     installer = Installer()
 
     try:
@@ -105,6 +106,7 @@ def remove_skill(
     version: str | None = typer.Option(None, "--version", "-v", help="Specific version"),
 ):
     from skillforge.registry.installer import Installer
+
     installer = Installer()
 
     if installer.remove(name, version):
@@ -133,7 +135,9 @@ def skill_info(name: str = typer.Argument(..., help="Skill name")):
     console.print(f"  [bold]Mode:[/bold] {entry.execution_mode}")
     console.print(f"  [bold]Tags:[/bold] {', '.join(entry.tags)}")
     console.print(f"  [bold]Categories:[/bold] {', '.join(entry.categories)}")
-    console.print(f"  [bold]Dependencies:[/bold] {', '.join(entry.dependencies) if entry.dependencies else 'None'}")
+    console.print(
+        f"  [bold]Dependencies:[/bold] {', '.join(entry.dependencies) if entry.dependencies else 'None'}"
+    )
     console.print(f"  [bold]Path:[/bold] {entry.skill_path}")
     console.print(f"  [bold]Installed:[/bold] {entry.installed_at.isoformat()}")
     reg.close()
@@ -155,11 +159,15 @@ def registry_stats():
 def publish_skill(
     path: str = typer.Argument(..., help="Path to skill directory or .zip file"),
     registry_url: str = typer.Option(
-        None, "--registry-url", "-r",
+        None,
+        "--registry-url",
+        "-r",
         help="Registry server URL (env: SKILLFORGE_REGISTRY_URL)",
     ),
     api_key: str = typer.Option(
-        None, "--api-key", "-k",
+        None,
+        "--api-key",
+        "-k",
         help="API key for authentication (env: SKILLFORGE_API_KEY)",
     ),
 ):
@@ -228,11 +236,15 @@ def publish_skill(
 @registry_app.command("login")
 def registry_login(
     registry_url: str = typer.Option(
-        None, "--registry-url", "-r",
+        None,
+        "--registry-url",
+        "-r",
         help="Registry server URL",
     ),
     api_key: str = typer.Option(
-        None, "--api-key", "-k",
+        None,
+        "--api-key",
+        "-k",
         help="API key for authentication",
     ),
 ):
@@ -319,7 +331,9 @@ def community_install(
 def community_submit(
     path: str = typer.Argument(..., help="Path to skill directory"),
     api_key: str = typer.Option(
-        None, "--api-key", "-k",
+        None,
+        "--api-key",
+        "-k",
         help="API key for community registry authentication",
     ),
 ):
@@ -335,7 +349,9 @@ def community_submit(
             except (json.JSONDecodeError, OSError):
                 pass
     if not key:
-        console.print("[red]API key required. Provide via --api-key or run 'skillforge registry login'[/red]")
+        console.print(
+            "[red]API key required. Provide via --api-key or run 'skillforge registry login'[/red]"
+        )
         raise typer.Exit(1)
 
     cr = CommunityRegistry()

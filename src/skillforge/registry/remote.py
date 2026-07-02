@@ -43,7 +43,11 @@ class RemoteRegistry:
 
         skills: list[dict[str, Any]] = []
         for item in items if isinstance(items, list) else [items]:
-            if item.get("type") == "file" and item["name"] in ("skill.yaml", "skill.yml", "skill.json"):
+            if item.get("type") == "file" and item["name"] in (
+                "skill.yaml",
+                "skill.yml",
+                "skill.json",
+            ):
                 file_resp = self.client.get(item["download_url"])
                 file_resp.raise_for_status()
                 content = file_resp.text

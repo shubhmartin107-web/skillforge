@@ -31,6 +31,7 @@ def create_test_page():
         from pathlib import Path
 
         import yaml
+
         p = Path(manifest_path)
         if p.exists():
             raw = yaml.safe_load(p.read_text("utf-8"))
@@ -53,10 +54,7 @@ def create_test_page():
         executor = Executor()
 
         try:
-            if use_sandbox:
-                result = executor.execute_in_sandbox(req)
-            else:
-                result = executor.execute(req)
+            result = executor.execute_in_sandbox(req) if use_sandbox else executor.execute(req)
         except Exception as e:
             return f"Execution error: {e}", ""
 

@@ -74,7 +74,10 @@ class AuditLogger:
     def _sanitize(self, data: dict) -> dict:
         sanitized = {}
         for key, value in data.items():
-            if any(sensitive in key.lower() for sensitive in ("key", "secret", "password", "token", "auth")):
+            if any(
+                sensitive in key.lower()
+                for sensitive in ("key", "secret", "password", "token", "auth")
+            ):
                 sanitized[key] = "***"
             elif isinstance(value, str) and len(value) > 500:
                 sanitized[key] = value[:500] + "..."

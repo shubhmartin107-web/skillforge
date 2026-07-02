@@ -7,7 +7,9 @@ from skillforge.security.permissions import (
 )
 
 __all__ = [
-    "PermissionValidator", "PermissionError",
-    "IntegrityError", "verify_skill_integrity",
+    "PermissionValidator",
+    "PermissionError",
+    "IntegrityError",
+    "verify_skill_integrity",
     "AuditLogger",
 ]

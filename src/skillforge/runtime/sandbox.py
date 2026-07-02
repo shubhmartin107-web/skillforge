@@ -29,7 +29,9 @@ class Sandbox:
         self.permissions = permissions or Permission()
         self.timeout = timeout or settings.execution_timeout
         self.max_memory_mb = max_memory_mb or settings.max_memory_mb
-        self.network_enabled = network_enabled if network_enabled is not None else settings.network_enabled
+        self.network_enabled = (
+            network_enabled if network_enabled is not None else settings.network_enabled
+        )
         self._tmpdir: Path | None = None
 
     def __enter__(self) -> Sandbox:
@@ -91,6 +93,7 @@ class Sandbox:
                 env[var_name] = os.environ[var_name]
 
         import json as _json
+
         input_json = _json.dumps(inputs)
 
         try:
@@ -118,6 +121,7 @@ class Sandbox:
             result_json = proc.stdout.split(marker, 1)[1].strip()
             try:
                 import json as _json2
+
                 return _json2.loads(result_json)
             except Exception as e:
                 raise SandboxError(f"Failed to parse result: {e}")
@@ -128,5 +132,7 @@ class Sandbox:
         resource.setrlimit(resource.RLIMIT_CPU, (self.timeout, self.timeout + 5))
         mem_bytes = self.max_memory_mb * 1024 * 1024
         resource.setrlimit(resource.RLIMIT_AS, (mem_bytes, mem_bytes))
-        signal.signal(signal.SIGALRM, lambda *_: (_ for _ in ()).throw(TimeoutError("Execution timed out")))
+        signal.signal(
+            signal.SIGALRM, lambda *_: (_ for _ in ()).throw(TimeoutError("Execution timed out"))
+        )
         signal.alarm(self.timeout)

@@ -70,7 +70,7 @@ def create_skill(
 @skill_app.command("run")
 def run_skill(
     name: str = typer.Argument(..., help="Skill name"),
-    inputs: list[str] = typer.Option([], "--input", "-i", help="Input as key=value"),
+    inputs: list[str] = typer.Option([], "--input", "-i", help="Input key=value"),
     version: str | None = typer.Option(None, "--version", "-v", help="Skill version"),
     sandbox: bool = typer.Option(False, "--sandbox", "-s", help="Run in sandbox"),
 ):
@@ -80,7 +80,9 @@ def run_skill(
             key, value = inp.split("=", 1)
             parsed_inputs[key] = value
         else:
-            console.print(f"[yellow]Warning: ignoring invalid input '{inp}' (use key=value)[/yellow]")
+            console.print(
+                f"[yellow]Warning: ignoring invalid input '{inp}' (use key=value)[/yellow]"
+            )
 
     req = ExecutionRequest(
         skill_name=name,
@@ -91,10 +93,7 @@ def run_skill(
     executor = Executor()
 
     try:
-        if sandbox:
-            result = executor.execute_in_sandbox(req)
-        else:
-            result = executor.execute(req)
+        result = executor.execute_in_sandbox(req) if sandbox else executor.execute(req)
     except Exception as e:
         console.print(f"[red]Execution failed: {e}[/red]")
         raise typer.Exit(1) from e
@@ -136,7 +135,7 @@ def test_skill(
     console.print(f"  Outputs: {len(manifest.outputs)}")
     console.print(f"  Dependencies: {len(manifest.dependencies)}")
 
-    test_inputs: dict[str, str] = {}
+    test_inputs: dict[str, object] = {}
     for inp in manifest.inputs:
         if inp.default is not None:
             test_inputs[inp.name] = inp.default
@@ -189,6 +188,7 @@ def validate_skill(
         content = skill_path.read_text("utf-8")
         if skill_path.suffix == ".json":
             import json
+
             data = json.loads(content)
         else:
             data = yaml.safe_load(content)
@@ -197,7 +197,9 @@ def validate_skill(
         console.print(f"  Inputs: {len(manifest.inputs)}")
         console.print(f"  Outputs: {len(manifest.outputs)}")
         console.print(f"  Dependencies: {len(manifest.dependencies)}")
-        console.print(f"  Permissions: network={manifest.permissions.network}, dangerous={manifest.permissions.dangerous}")
+        console.print(
+            f"  Permissions: network={manifest.permissions.network}, dangerous={manifest.permissions.dangerous}"
+        )
     except Exception as e:
         console.print(f"[red]✗ Invalid manifest: {e}[/red]")
         raise typer.Exit(1) from e

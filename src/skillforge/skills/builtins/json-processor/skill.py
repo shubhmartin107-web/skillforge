@@ -16,6 +16,7 @@ def process_json(data: str, query: str = "", pretty_print: bool = False) -> dict
     if query:
         try:
             import jmespath
+
             result = jmespath.search(query, parsed)
         except ImportError:
             result = {"error": "JMESPath not available", "data": parsed}

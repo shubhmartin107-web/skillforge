@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import importlib
+import importlib.util
 import os
 import resource
 import shutil
@@ -136,7 +136,9 @@ class WasmSandbox:
             return self._execute_fallback(script_path.read_text("utf-8"), "run", {})
         except Exception as e:
             return self._execute_fallback(
-                script_path.read_text("utf-8"), "run", {},
+                script_path.read_text("utf-8"),
+                "run",
+                {},
                 f"Wasmtime error, falling back: {e}",
             )
 
@@ -151,6 +153,7 @@ class WasmSandbox:
             store = wasmer.Store()
             module = wasmer.Module(store, wasm_bytes)
             import wasmer_compiler_cranelift
+
             compiler = wasmer_compiler_cranelift.Compiler()
             instance = wasmer.Instance(module, compiler=compiler)
 
@@ -162,13 +165,16 @@ class WasmSandbox:
             return self._execute_fallback(script_path.read_text("utf-8"), "run", {})
         except Exception as e:
             return self._execute_fallback(
-                script_path.read_text("utf-8"), "run", {},
+                script_path.read_text("utf-8"),
+                "run",
+                {},
                 f"Wasmer error, falling back: {e}",
             )
 
     def _compile_python_to_wasm(self, script_path: Path) -> bytes | None:
         try:
             import pyodide
+
             source = script_path.read_text("utf-8")
             wasm_module = pyodide.compile(source)
             return wasm_module
@@ -176,6 +182,7 @@ class WasmSandbox:
             pass
         try:
             import micropython
+
             source = script_path.read_text("utf-8")
             return micropython.compile_to_wasm(source)
         except (ImportError, AttributeError):
@@ -267,6 +274,7 @@ class WasmSandbox:
 
         try:
             import ctypes
+
             libc = ctypes.CDLL("libc.so.6", use_errno=True)
 
             pr_set_no_new_privs = 38

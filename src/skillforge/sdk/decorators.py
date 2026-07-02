@@ -49,16 +49,21 @@ def skill(
         if auto_register:
             tmp = Path(tempfile.mkdtemp(prefix="skillforge_decorator_"))
             import yaml
-            (tmp / "skill.yaml").write_text(yaml.dump(manifest.to_yaml_dict(), default_flow_style=False))
+
+            (tmp / "skill.yaml").write_text(
+                yaml.dump(manifest.to_yaml_dict(), default_flow_style=False)
+            )
 
             try:
                 source = textwrap.dedent(inspect.getsource(func))
-                def_line = re.search(r'^def\s', source, re.MULTILINE)
+                def_line = re.search(r"^def\s", source, re.MULTILINE)
                 if def_line:
-                    source = source[def_line.start():]
-                source = source.lstrip('\n')
+                    source = source[def_line.start() :]
+                source = source.lstrip("\n")
             except (OSError, TypeError):
-                source = f"def {func.__name__}(*args, **kwargs):\n    return func(*args, **kwargs)\n"
+                source = (
+                    f"def {func.__name__}(*args, **kwargs):\n    return func(*args, **kwargs)\n"
+                )
 
             entrypoint = manifest.execution.get("entrypoint", "skill.py")
             (tmp / entrypoint).write_text(source)

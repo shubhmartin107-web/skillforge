@@ -92,10 +92,13 @@ class WorkflowEngine:
         if workflow.start_node is None or workflow.start_node not in workflow.nodes:
             raise WorkflowError("Workflow has no valid start node")
 
-        hooks.emit("workflow.started", {
-            "workflow_name": workflow.name,
-            "workflow_version": workflow.version,
-        })
+        hooks.emit(
+            "workflow.started",
+            {
+                "workflow_name": workflow.name,
+                "workflow_version": workflow.version,
+            },
+        )
 
         current_id: str | None = workflow.start_node
         visited: set[str] = set()
@@ -138,7 +141,7 @@ class WorkflowEngine:
                     items = self._resolve_path(context, node.iterate_over)
                     if isinstance(items, list):
                         results = []
-                        for i, item in enumerate(items):
+                        for _i, item in enumerate(items):
                             item_context = {**context, "item": item}
                             context[f"steps.{node.id}.current"] = item
                             sub_node = workflow.nodes.get(node.node_id)
@@ -171,10 +174,13 @@ class WorkflowEngine:
                     current_id = None
 
             except Exception as e:
-                hooks.emit("workflow.failed", {
-                    "node_id": current_id,
-                    "error": str(e),
-                })
+                hooks.emit(
+                    "workflow.failed",
+                    {
+                        "node_id": current_id,
+                        "error": str(e),
+                    },
+                )
                 raise WorkflowError(f"Workflow failed at node '{current_id}': {e}")
 
         hooks.emit("workflow.completed", {"status": "completed"})

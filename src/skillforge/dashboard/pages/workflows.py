@@ -13,6 +13,7 @@ def create_workflows_page():
             return "Please enter a workflow YAML definition.", ""
 
         import yaml
+
         try:
             data = yaml.safe_load(yaml_content)
             workflow = Workflow.from_dict(data)
@@ -51,7 +52,9 @@ nodes:
 
     with gr.Column():
         gr.Markdown("## Workflow Runner")
-        gr.Markdown("Define and execute multi-step workflows. Each step can call a different skill.")
+        gr.Markdown(
+            "Define and execute multi-step workflows. Each step can call a different skill."
+        )
 
         with gr.Row():
             with gr.Column(scale=2):

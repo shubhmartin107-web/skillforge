@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import uuid
 from pathlib import Path
 
@@ -71,6 +70,7 @@ execution:
     def test_register_skill_inline(self):
         name = _unique_name("inline")
         with Forge() as forge:
+
             @forge.register_skill(
                 name=name,
                 description="An inline test skill",

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 from pathlib import Path
 from typing import Any
 
@@ -42,7 +43,9 @@ class Forge:
     def list_skills(self) -> list[RegistryEntry]:
         return self.registry.list_all()
 
-    def search(self, query: str = "", tags: list[str] | None = None, category: str = "") -> SearchResult:
+    def search(
+        self, query: str = "", tags: list[str] | None = None, category: str = ""
+    ) -> SearchResult:
         q = SearchQuery(query=query, tags=tags or [])
         if category:
             q.categories = [category]
@@ -53,6 +56,7 @@ class Forge:
 
     def get_skill_manifest(self, name: str) -> SkillManifest | None:
         import yaml
+
         entry = self.registry.get(name)
         if entry is None:
             return None
@@ -136,12 +140,14 @@ class Forge:
 
     def create_skill(self, name: str, path: str | None = None) -> Path:
         from skillforge.cli.skill_cmds import _create_skill_files
+
         dest = Path(path or Path.cwd() / name)
         _create_skill_files(dest, name)
         return dest
 
     def validate_manifest(self, path: str | Path) -> SkillManifest:
         import yaml
+
         p = Path(path)
         content = p.read_text("utf-8")
         data = yaml.safe_load(content)
@@ -210,23 +216,25 @@ class _SkillRegistrar:
 
         tmp = Path(tempfile.mkdtemp(prefix="skillforge_inline_"))
         import yaml
-        (tmp / "skill.yaml").write_text(yaml.dump(manifest.to_yaml_dict(), default_flow_style=False))
+
+        (tmp / "skill.yaml").write_text(
+            yaml.dump(manifest.to_yaml_dict(), default_flow_style=False)
+        )
         import re
         import textwrap
+
         try:
             source = textwrap.dedent(inspect.getsource(func))
-            def_line = re.search(r'^def\s', source, re.MULTILINE)
+            def_line = re.search(r"^def\s", source, re.MULTILINE)
             if def_line:
-                source = source[def_line.start():]
-            source = source.lstrip('\n')
+                source = source[def_line.start() :]
+            source = source.lstrip("\n")
         except (OSError, TypeError):
             source = f"def {func.__name__}(*args, **kwargs):\n    return func(*args, **kwargs)\n"
         entrypoint = manifest.execution.get("entrypoint", "skill.py")
         (tmp / entrypoint).write_text(source)
 
-        try:
+        with contextlib.suppress(Exception):
             self.forge.installer.install_from_path(tmp)
-        except Exception:
-            pass
 
         return func

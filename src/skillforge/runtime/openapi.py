@@ -187,8 +187,11 @@ def generate_openapi_spec(manifest_or_path: SkillManifest | str | Path) -> dict[
         spec["info"]["license"] = {"name": manifest.license}
 
     if manifest.examples:
-        spec["info"]["description"] = (spec["info"]["description"] + "\n\n### Examples\n" +
-                                       "\n".join(f"- `{json.dumps(e)}`" for e in manifest.examples))
+        spec["info"]["description"] = (
+            spec["info"]["description"]
+            + "\n\n### Examples\n"
+            + "\n".join(f"- `{json.dumps(e)}`" for e in manifest.examples)
+        )
 
     return spec
 
@@ -241,7 +244,7 @@ def serve_openapi_spec(
     swagger_html = f"""<!DOCTYPE html>
 <html>
 <head>
-  <title>{spec['info']['title']}</title>
+  <title>{spec["info"]["title"]}</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css">
 </head>
 <body>

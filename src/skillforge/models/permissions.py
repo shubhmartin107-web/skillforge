@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
 
 
-class Capability(str, Enum):
+class Capability(StrEnum):
     network = "network"
     filesystem_read = "filesystem_read"
     filesystem_write = "filesystem_write"
@@ -36,9 +36,11 @@ class PermissionSet(BaseModel):
     def allowed_paths(self, capability: Capability) -> list[str]:
         if self.allow_all:
             return ["*"]
-        return [p.paths for p in self.permissions if p.capability == capability][0] if any(
-            p.capability == capability for p in self.permissions
-        ) else []
+        return (
+            [p.paths for p in self.permissions if p.capability == capability][0]
+            if any(p.capability == capability for p in self.permissions)
+            else []
+        )
 
     def to_dict(self) -> dict[str, Any]:
         return self.model_dump(exclude_none=True)

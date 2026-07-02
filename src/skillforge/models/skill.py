@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
 from semver import Version
 
 
-class ExecutionMode(str, Enum):
+class ExecutionMode(StrEnum):
     direct = "direct"
     tool_calling = "tool_calling"
     sub_agent = "sub_agent"
@@ -65,12 +65,14 @@ class SkillManifest(BaseModel):
     outputs: list[SkillOutput] = Field(default_factory=list)
     dependencies: list[SkillDependency] = Field(default_factory=list)
     permissions: Permission = Field(default_factory=Permission)
-    execution: dict[str, Any] = Field(default_factory=lambda: {
-        "mode": "direct",
-        "entrypoint": "skill.py",
-        "function": "run",
-        "runtime": "python3.12",
-    })
+    execution: dict[str, Any] = Field(
+        default_factory=lambda: {
+            "mode": "direct",
+            "entrypoint": "skill.py",
+            "function": "run",
+            "runtime": "python3.12",
+        }
+    )
     tags: list[str] = Field(default_factory=list)
     categories: list[str] = Field(default_factory=list)
     license: str = ""
@@ -95,7 +97,9 @@ class SkillManifest(BaseModel):
             raise ValueError("Skill name must start with an alphanumeric character")
         allowed = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.")
         if not all(c in allowed for c in v):
-            raise ValueError("Skill name may only contain alphanumerics, hyphens, underscores, and dots")
+            raise ValueError(
+                "Skill name may only contain alphanumerics, hyphens, underscores, and dots"
+            )
         return v
 
     def to_yaml_dict(self) -> dict[str, Any]:

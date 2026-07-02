@@ -29,16 +29,19 @@ class OllamaProvider(BaseProvider):
         **kwargs: Any,
     ) -> dict[str, Any]:
         client = self._get_client()
-        resp = client.post("/api/chat", json={
-            "model": self.model,
-            "messages": messages,
-            "options": {
-                "temperature": temperature,
-                "num_predict": max_tokens,
-                **kwargs,
+        resp = client.post(
+            "/api/chat",
+            json={
+                "model": self.model,
+                "messages": messages,
+                "options": {
+                    "temperature": temperature,
+                    "num_predict": max_tokens,
+                    **kwargs,
+                },
+                "stream": False,
             },
-            "stream": False,
-        })
+        )
         resp.raise_for_status()
         data = resp.json()
         return {

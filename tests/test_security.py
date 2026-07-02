@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 from skillforge.security.audit import AuditLogger
 from skillforge.security.permissions import PermissionValidator
 
@@ -10,39 +8,48 @@ class TestPermissionValidator:
     def test_network_default_denied(self):
         from skillforge.models.skill import Permission
         from skillforge.security.permissions import PermissionError
+
         p = PermissionValidator(Permission())
         import pytest
+
         with pytest.raises(PermissionError):
             p.check_network()
 
     def test_network_allowed(self):
         from skillforge.models.skill import Permission
+
         p = PermissionValidator(Permission(network=True))
         assert p.check_network()
 
     def test_file_read_allowed(self):
         from skillforge.models.skill import Permission
+
         p = PermissionValidator(Permission(filesystem_read=["/tmp"]))
         assert p.check_file_read("/tmp/test.txt")
 
     def test_file_read_denied(self):
         from skillforge.models.skill import Permission
         from skillforge.security.permissions import PermissionError
+
         p = PermissionValidator(Permission(filesystem_read=["/tmp"]))
         import pytest
+
         with pytest.raises(PermissionError):
             p.check_file_read("/etc/passwd")
 
     def test_environ(self):
         from skillforge.models.skill import Permission
+
         p = PermissionValidator(Permission(env_vars=["MY_VAR"]))
         assert p.check_env_var("MY_VAR")
 
     def test_dangerous_denied(self):
         from skillforge.models.skill import Permission
         from skillforge.security.permissions import PermissionError
+
         p = PermissionValidator(Permission())
         import pytest
+
         with pytest.raises(PermissionError):
             p.check_dangerous()
 

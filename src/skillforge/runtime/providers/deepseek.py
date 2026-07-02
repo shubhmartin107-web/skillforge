@@ -18,6 +18,7 @@ class DeepSeekProvider(BaseProvider):
         if self._client is None:
             try:
                 from openai import OpenAI
+
                 self._client = OpenAI(
                     api_key=self.api_key,
                     base_url="https://api.deepseek.com",

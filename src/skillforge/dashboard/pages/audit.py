@@ -17,10 +17,14 @@ def create_audit_page():
 
     with gr.Column():
         gr.Markdown("## Audit Log")
-        gr.Markdown("Recent skill execution events. Sensitive data (keys, tokens) is automatically redacted.")
+        gr.Markdown(
+            "Recent skill execution events. Sensitive data (keys, tokens) is automatically redacted."
+        )
 
         with gr.Row():
-            limit_input = gr.Number(value=50, label="Entries to show", minimum=1, maximum=500, step=1)
+            limit_input = gr.Number(
+                value=50, label="Entries to show", minimum=1, maximum=500, step=1
+            )
             refresh_btn = gr.Button("🔄 Refresh", variant="primary")
 
         audit_output = gr.Code(

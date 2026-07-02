@@ -71,9 +71,12 @@ class DependencyResolver:
                 elif constraint.startswith("^"):
                     if sv.major == constraint_ver.major and sv >= constraint_ver:
                         return v
-                elif constraint.startswith("~"):
-                    if sv.major == constraint_ver.major and sv.minor == constraint_ver.minor and sv >= constraint_ver:
-                        return v
+                elif constraint.startswith("~") and (
+                    sv.major == constraint_ver.major
+                    and sv.minor == constraint_ver.minor
+                    and sv >= constraint_ver
+                ):
+                    return v
             return None
 
         for v in versions:
@@ -91,7 +94,11 @@ class DependencyResolver:
                 if sv.major == constraint_ver.major and sv >= constraint_ver:
                     return v
             elif constraint.startswith("~"):
-                if sv.major == constraint_ver.major and sv.minor == constraint_ver.minor and sv >= constraint_ver:
+                if (
+                    sv.major == constraint_ver.major
+                    and sv.minor == constraint_ver.minor
+                    and sv >= constraint_ver
+                ):
                     return v
             elif sv == constraint_ver:
                 return v
@@ -114,9 +121,7 @@ class DependencyResolver:
             return sv_versions[0][0] if sv_versions else None
 
         try:
-            constraint_ver = semver.Version.parse(
-                constraint.lstrip("^~>=<")
-            )
+            constraint_ver = semver.Version.parse(constraint.lstrip("^~>=<"))
         except ValueError:
             return None
 
@@ -131,7 +136,11 @@ class DependencyResolver:
                 if sv.major == constraint_ver.major and sv >= constraint_ver:
                     return entry
             elif constraint.startswith("~"):
-                if sv.major == constraint_ver.major and sv.minor == constraint_ver.minor and sv >= constraint_ver:
+                if (
+                    sv.major == constraint_ver.major
+                    and sv.minor == constraint_ver.minor
+                    and sv >= constraint_ver
+                ):
                     return entry
             elif sv == constraint_ver:
                 return entry

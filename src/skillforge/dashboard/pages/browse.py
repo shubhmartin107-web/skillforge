@@ -21,14 +21,16 @@ def create_browse_page():
 
         rows = []
         for entry in result.entries:
-            rows.append([
-                entry.name,
-                entry.version,
-                entry.description[:60],
-                entry.author_name,
-                ", ".join(entry.tags[:3]),
-                entry.execution_mode,
-            ])
+            rows.append(
+                [
+                    entry.name,
+                    entry.version,
+                    entry.description[:60],
+                    entry.author_name,
+                    ", ".join(entry.tags[:3]),
+                    entry.execution_mode,
+                ]
+            )
         return rows
 
     def get_all_tags() -> list[str]:
@@ -41,7 +43,9 @@ def create_browse_page():
         return [""] + sorted(tags)
 
     with gr.Column():
-        gr.Markdown(f"**{stats.total_skills} skills installed** | {stats.total_categories} categories")
+        gr.Markdown(
+            f"**{stats.total_skills} skills installed** | {stats.total_categories} categories"
+        )
 
         with gr.Row():
             search_input = gr.Textbox(label="Search", placeholder="Search skills...", scale=3)

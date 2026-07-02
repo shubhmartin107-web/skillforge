@@ -37,15 +37,18 @@ def create_inspect_page():
         except Exception as e:
             return (entry.name, entry.version, entry.description, "", f"Parse error: {e}")
 
-        inputs_str = "\n".join(
-            f"  - {i.name} ({i.type}){' required' if i.required else ''}: {i.description}"
-            for i in manifest.inputs
-        ) or "  (none)"
+        inputs_str = (
+            "\n".join(
+                f"  - {i.name} ({i.type}){' required' if i.required else ''}: {i.description}"
+                for i in manifest.inputs
+            )
+            or "  (none)"
+        )
 
-        outputs_str = "\n".join(
-            f"  - {o.name} ({o.type}): {o.description}"
-            for o in manifest.outputs
-        ) or "  (none)"
+        outputs_str = (
+            "\n".join(f"  - {o.name} ({o.type}): {o.description}" for o in manifest.outputs)
+            or "  (none)"
+        )
 
         details = (
             f"**Author**: {manifest.author.name}\n"
@@ -60,8 +63,13 @@ def create_inspect_page():
             f"**Dependencies**: {', '.join(d.name for d in manifest.dependencies) or 'None'}\n"
         )
 
-        return (entry.name, entry.version, entry.description, details,
-                f"### Inputs\n{inputs_str}\n\n### Outputs\n{outputs_str}")
+        return (
+            entry.name,
+            entry.version,
+            entry.description,
+            details,
+            f"### Inputs\n{inputs_str}\n\n### Outputs\n{outputs_str}",
+        )
 
     with gr.Column():
         skill_dropdown = gr.Dropdown(

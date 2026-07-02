@@ -4,7 +4,6 @@ from pathlib import Path
 
 from skillforge.composition.nodes import ConditionNode, SkillNode
 from skillforge.composition.workflow import Workflow, WorkflowEngine
-from skillforge.models.execution import ExecutionRequest
 from skillforge.runtime.executor import Executor
 
 
@@ -33,11 +32,13 @@ execution:
         installer.install_from_path(skill_dir)
 
         wf = Workflow(name="test-wf")
-        wf.add_node(SkillNode(
-            id="step1",
-            skill_name="wf-adder",
-            inputs={"a": "{workflow.inputs.x}", "b": "{workflow.inputs.y}"},
-        ))
+        wf.add_node(
+            SkillNode(
+                id="step1",
+                skill_name="wf-adder",
+                inputs={"a": "{workflow.inputs.x}", "b": "{workflow.inputs.y}"},
+            )
+        )
 
         executor = Executor(registry=registry)
         engine = WorkflowEngine(executor=executor)
@@ -48,12 +49,14 @@ execution:
 
     def test_conditional_workflow(self):
         wf = Workflow(name="cond-wf")
-        wf.add_node(ConditionNode(
-            id="check",
-            condition="{steps.previous.value} > 10",
-            true_branch="large",
-            false_branch="small",
-        ))
+        wf.add_node(
+            ConditionNode(
+                id="check",
+                condition="{steps.previous.value} > 10",
+                true_branch="large",
+                false_branch="small",
+            )
+        )
 
         result_id = wf.nodes["check"].evaluate({"steps.previous.value": 15})
         assert result_id == "large"

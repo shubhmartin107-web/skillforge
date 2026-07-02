@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import json
 import sqlite3
 from datetime import datetime
@@ -52,10 +53,8 @@ class LocalRegistry:
             CREATE INDEX IF NOT EXISTS idx_skills_tags ON skills(tags);
             CREATE INDEX IF NOT EXISTS idx_skills_categories ON skills(categories);
         """)
-        try:
+        with contextlib.suppress(sqlite3.OperationalError):
             self.conn.execute("ALTER TABLE skills ADD COLUMN downloads INTEGER DEFAULT 0")
-        except sqlite3.OperationalError:
-            pass
 
     def install(self, entry: RegistryEntry) -> None:
         data = entry.to_dict()
@@ -66,7 +65,8 @@ class LocalRegistry:
         data["dependencies"] = json.dumps(data.get("dependencies", []))
         data.setdefault("downloads", 0)
 
-        self.conn.execute("""
+        self.conn.execute(
+            """
             INSERT OR REPLACE INTO skills
                 (name, version, description, author_name, tags, categories,
                  installed_at, updated_at, source, source_url,
@@ -77,12 +77,16 @@ class LocalRegistry:
                  :installed_at, :updated_at, :source, :source_url,
                  :manifest_path, :skill_path, :dependencies, :entrypoint,
                  :execution_mode, :size_bytes, :downloads)
-        """, data)
+        """,
+            data,
+        )
         self.conn.commit()
 
     def remove(self, name: str, version: str | None = None) -> bool:
         if version:
-            cursor = self.conn.execute("DELETE FROM skills WHERE name = ? AND version = ?", (name, version))
+            cursor = self.conn.execute(
+                "DELETE FROM skills WHERE name = ? AND version = ?", (name, version)
+            )
         else:
             cursor = self.conn.execute("DELETE FROM skills WHERE name = ?", (name,))
         self.conn.commit()
@@ -102,9 +106,7 @@ class LocalRegistry:
         return self._row_to_entry(row)
 
     def list_all(self) -> list[RegistryEntry]:
-        rows = self.conn.execute(
-            "SELECT * FROM skills ORDER BY name, installed_at DESC"
-        ).fetchall()
+        rows = self.conn.execute("SELECT * FROM skills ORDER BY name, installed_at DESC").fetchall()
         return [self._row_to_entry(r) for r in rows]
 
     def list_versions(self, name: str) -> list[RegistryEntry]:
@@ -143,12 +145,14 @@ class LocalRegistry:
         if conditions:
             where = "WHERE " + " AND ".join(conditions)
 
-        count_row = self.conn.execute(f"SELECT COUNT(*) as cnt FROM skills {where}", params).fetchone()
+        count_row = self.conn.execute(
+            f"SELECT COUNT(*) as cnt FROM skills {where}", params
+        ).fetchone()
         total = count_row["cnt"] if count_row else 0
 
         rows = self.conn.execute(
             f"SELECT * FROM skills {where} ORDER BY name LIMIT ? OFFSET ?",
-            params + [query.limit, query.offset]
+            params + [query.limit, query.offset],
         ).fetchall()
 
         return SearchResult(
@@ -170,20 +174,20 @@ class LocalRegistry:
         all_tags: set[str] = set()
         for r in tags_row:
             import json
-            try:
+
+            with contextlib.suppress(json.JSONDecodeError, TypeError):
                 all_tags.update(json.loads(r["tags"]))
-            except (json.JSONDecodeError, TypeError):
-                pass
 
         all_categories: set[str] = set()
         for r in self.conn.execute("SELECT categories FROM skills").fetchall():
             import json
-            try:
-                all_categories.update(json.loads(r["categories"]))
-            except (json.JSONDecodeError, TypeError):
-                pass
 
-        authors = self.conn.execute("SELECT COUNT(DISTINCT author_name) as cnt FROM skills").fetchone()
+            with contextlib.suppress(json.JSONDecodeError, TypeError):
+                all_categories.update(json.loads(r["categories"]))
+
+        authors = self.conn.execute(
+            "SELECT COUNT(DISTINCT author_name) as cnt FROM skills"
+        ).fetchone()
 
         return RegistryStats(
             total_skills=row["total_skills"] if row else 0,
@@ -194,24 +198,29 @@ class LocalRegistry:
         )
 
     def _row_to_entry(self, row: sqlite3.Row) -> RegistryEntry:
+        data = dict(row)
         return RegistryEntry(
-            name=row["name"],
-            version=row["version"],
-            description=row["description"],
-            author_name=row["author_name"],
-            tags=json.loads(row["tags"] or "[]"),
-            categories=json.loads(row["categories"] or "[]"),
-            installed_at=datetime.fromisoformat(row["installed_at"]) if row["installed_at"] else datetime.now(),
-            updated_at=datetime.fromisoformat(row["updated_at"]) if row["updated_at"] else datetime.now(),
-            source=row["source"],
-            source_url=row["source_url"],
-            manifest_path=row["manifest_path"],
-            skill_path=row["skill_path"],
-            dependencies=json.loads(row["dependencies"] or "[]"),
-            entrypoint=row["entrypoint"],
-            execution_mode=row["execution_mode"],
-            size_bytes=row["size_bytes"],
-            downloads=row["downloads"] if "downloads" in row.keys() else 0,
+            name=data["name"],
+            version=data["version"],
+            description=data["description"],
+            author_name=data["author_name"],
+            tags=json.loads(data["tags"] or "[]"),
+            categories=json.loads(data["categories"] or "[]"),
+            installed_at=datetime.fromisoformat(data["installed_at"])
+            if data["installed_at"]
+            else datetime.now(),
+            updated_at=datetime.fromisoformat(data["updated_at"])
+            if data["updated_at"]
+            else datetime.now(),
+            source=data["source"],
+            source_url=data["source_url"],
+            manifest_path=data["manifest_path"],
+            skill_path=data["skill_path"],
+            dependencies=json.loads(data["dependencies"] or "[]"),
+            entrypoint=data["entrypoint"],
+            execution_mode=data["execution_mode"],
+            size_bytes=data["size_bytes"],
+            downloads=data.get("downloads", 0),
         )
 
     def increment_downloads(self, name: str, version: str | None = None) -> None:

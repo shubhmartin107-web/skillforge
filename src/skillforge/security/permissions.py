@@ -93,8 +93,7 @@ def verify_against_checksums(skill_path: Path, checksums: dict[str, str]) -> boo
             raise IntegrityError(f"Missing file: {rel_path}")
         if actual != expected_hash:
             raise IntegrityError(
-                f"Integrity check failed for '{rel_path}': "
-                f"expected {expected_hash}, got {actual}"
+                f"Integrity check failed for '{rel_path}': expected {expected_hash}, got {actual}"
             )
     return True
 

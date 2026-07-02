@@ -18,9 +18,12 @@ class GeminiProvider(BaseProvider):
         if self._client is None:
             try:
                 from google import genai
+
                 self._client = genai.Client(api_key=self.api_key)
             except ImportError:
-                raise ImportError("google-genai package required. Install with: pip install google-genai")
+                raise ImportError(
+                    "google-genai package required. Install with: pip install google-genai"
+                )
         return self._client
 
     def chat(

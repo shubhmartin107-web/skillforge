@@ -18,6 +18,7 @@ class GroqProvider(BaseProvider):
         if self._client is None:
             try:
                 from groq import Groq
+
                 self._client = Groq(api_key=self.api_key)
             except ImportError:
                 raise ImportError("groq package required. Install with: pip install groq")

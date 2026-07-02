@@ -13,7 +13,8 @@ from skillforge.models.skill import SkillManifest
 from skillforge.registry.community import CommunityRegistry, CommunitySkill
 from skillforge.registry.local import LocalRegistry
 from skillforge.runtime.openapi import generate_openapi_spec, generate_openapi_yaml
-from skillforge.runtime.wasm_sandbox import WasmSandbox, create_sandbox
+from skillforge.runtime.sandbox import SandboxError
+from skillforge.runtime.wasm_sandbox import WasmSandbox, WasmSandboxError, create_sandbox
 
 
 class TestWasmSandbox:
@@ -55,7 +56,7 @@ class TestWasmSandbox:
     def test_wasm_sandbox_timeout(self):
         sandbox = WasmSandbox(timeout=1)
         with sandbox:
-            with pytest.raises(Exception):
+            with pytest.raises((SandboxError, WasmSandboxError, TimeoutError)):
                 sandbox.execute_python(
                     "import time\ndef run() -> dict:\n    time.sleep(10)\n    return {}",
                     function_name="run",
@@ -91,8 +92,19 @@ class TestOpenAPIGenerator:
             description="A test skill",
             author={"name": "Test Author", "contact": "test@example.com"},
             inputs=[
-                {"name": "message", "type": "string", "description": "Input message", "required": True},
-                {"name": "count", "type": "integer", "description": "Count value", "required": False, "default": 42},
+                {
+                    "name": "message",
+                    "type": "string",
+                    "description": "Input message",
+                    "required": True,
+                },
+                {
+                    "name": "count",
+                    "type": "integer",
+                    "description": "Count value",
+                    "required": False,
+                    "default": 42,
+                },
             ],
             outputs=[
                 {"name": "result", "type": "string", "description": "Output result"},
@@ -113,15 +125,30 @@ class TestOpenAPIGenerator:
     def test_generate_spec_from_yaml_file(self):
         with tempfile.TemporaryDirectory() as td:
             manifest_path = Path(td) / "skill.yaml"
-            manifest_path.write_text(yaml.dump({
-                "name": "file-test",
-                "version": "0.5.0",
-                "description": "From file",
-                "inputs": [{"name": "x", "type": "float", "description": "A number", "required": True}],
-                "outputs": [{"name": "y", "type": "float", "description": "Result"}],
-                "permissions": {"network": False},
-                "execution": {"mode": "direct", "entrypoint": "skill.py", "function": "run"},
-            }))
+            manifest_path.write_text(
+                yaml.dump(
+                    {
+                        "name": "file-test",
+                        "version": "0.5.0",
+                        "description": "From file",
+                        "inputs": [
+                            {
+                                "name": "x",
+                                "type": "float",
+                                "description": "A number",
+                                "required": True,
+                            }
+                        ],
+                        "outputs": [{"name": "y", "type": "float", "description": "Result"}],
+                        "permissions": {"network": False},
+                        "execution": {
+                            "mode": "direct",
+                            "entrypoint": "skill.py",
+                            "function": "run",
+                        },
+                    }
+                )
+            )
             spec = generate_openapi_spec(str(manifest_path))
             assert "file-test" in spec["info"]["title"]
             assert spec["info"]["version"] == "0.5.0"
@@ -144,7 +171,13 @@ class TestOpenAPIGenerator:
             description="Test request body",
             inputs=[
                 {"name": "name", "type": "string", "description": "Your name", "required": True},
-                {"name": "age", "type": "integer", "description": "Your age", "required": False, "default": 0},
+                {
+                    "name": "age",
+                    "type": "integer",
+                    "description": "Your age",
+                    "required": False,
+                    "default": 0,
+                },
             ],
             outputs=[{"name": "greeting", "type": "string", "description": "Greeting"}],
             execution={"mode": "direct", "entrypoint": "skill.py", "function": "run"},
@@ -197,32 +230,43 @@ class TestCommunityRegistry:
         assert cr.base_url == "https://custom.example.com"
 
     def test_community_registry_discover_no_server(self):
+        import httpx
+
         cr = CommunityRegistry(base_url="http://localhost:1")
-        with pytest.raises(Exception):
+        with pytest.raises((httpx.ConnectError, httpx.RequestError)):
             cr.discover()
 
     def test_community_registry_install_no_server(self):
+        import httpx
+
         cr = CommunityRegistry(base_url="http://localhost:1")
-        with pytest.raises(Exception):
+        with pytest.raises((httpx.ConnectError, httpx.RequestError)):
             cr.install_from_community("nonexistent-skill")
 
     def test_community_registry_submit_no_server(self):
+        import httpx
+
         cr = CommunityRegistry(base_url="http://localhost:1")
         with tempfile.TemporaryDirectory() as td:
             skill_dir = Path(td) / "test-skill"
             skill_dir.mkdir()
-            (skill_dir / "skill.yaml").write_text(yaml.dump({
-                "name": "test-skill",
-                "version": "0.1.0",
-                "execution": {"mode": "direct"},
-            }))
-            with pytest.raises(Exception):
+            (skill_dir / "skill.yaml").write_text(
+                yaml.dump(
+                    {
+                        "name": "test-skill",
+                        "version": "0.1.0",
+                        "execution": {"mode": "direct"},
+                    }
+                )
+            )
+            with pytest.raises((httpx.ConnectError, httpx.RequestError)):
                 cr.submit_skill(skill_dir, "test-key")
 
 
 class TestServerUpgrade:
     def test_registry_entry_has_downloads(self):
         from skillforge.models.registry import RegistryEntry
+
         entry = RegistryEntry(
             name="test-downloads",
             version="1.0.0",
@@ -233,8 +277,10 @@ class TestServerUpgrade:
         assert entry.downloads == 0
 
     def test_server_health_endpoint(self):
-        from skillforge.registry.server import app
         from fastapi.testclient import TestClient
+
+        from skillforge.registry.server import app
+
         client = TestClient(app)
         response = client.get("/health")
         assert response.status_code == 200
@@ -243,8 +289,10 @@ class TestServerUpgrade:
         assert data["version"] == __version__
 
     def test_server_skills_endpoint(self):
-        from skillforge.registry.server import app
         from fastapi.testclient import TestClient
+
+        from skillforge.registry.server import app
+
         client = TestClient(app)
         response = client.get("/api/v1/skills")
         assert response.status_code == 200
@@ -253,15 +301,19 @@ class TestServerUpgrade:
         assert "total" in data
 
     def test_server_stats_endpoint(self):
-        from skillforge.registry.server import app
         from fastapi.testclient import TestClient
+
+        from skillforge.registry.server import app
+
         client = TestClient(app)
         response = client.get("/api/v1/stats")
         assert response.status_code == 200
 
     def test_server_index_endpoint(self):
-        from skillforge.registry.server import app
         from fastapi.testclient import TestClient
+
+        from skillforge.registry.server import app
+
         client = TestClient(app)
         response = client.get("/api/v1/index")
         assert response.status_code == 200
@@ -269,9 +321,11 @@ class TestServerUpgrade:
         assert data["format"] == "skillforge-registry-v1"
 
     def test_server_profile_no_auth(self):
-        from skillforge.registry.server import app
-        from skillforge.config import settings as settings_mod
         from fastapi.testclient import TestClient
+
+        from skillforge.config import settings as settings_mod
+        from skillforge.registry.server import app
+
         old_keys = settings_mod.server_api_keys
         settings_mod.server_api_keys = ["test-key"]
         try:
@@ -285,9 +339,10 @@ class TestServerUpgrade:
         import io
         import zipfile
 
-        from skillforge.registry.server import app
-        from skillforge.config import settings as settings_mod
         from fastapi.testclient import TestClient
+
+        from skillforge.config import settings as settings_mod
+        from skillforge.registry.server import app
 
         old_keys = settings_mod.server_api_keys
         settings_mod.server_api_keys = ["test-key"]
@@ -295,10 +350,13 @@ class TestServerUpgrade:
             zip_buffer = io.BytesIO()
             with zipfile.ZipFile(zip_buffer, "w") as zf:
                 zf.writestr("skill.py", "def run(): return {}")
-            manifest_data = yaml.dump({
-                "name": "test", "version": "1.0.0",
-                "execution": {"mode": "direct", "entrypoint": "skill.py", "function": "run"},
-            })
+            manifest_data = yaml.dump(
+                {
+                    "name": "test",
+                    "version": "1.0.0",
+                    "execution": {"mode": "direct", "entrypoint": "skill.py", "function": "run"},
+                }
+            )
             client = TestClient(app)
             response = client.post(
                 "/api/v1/skills/publish",
@@ -310,9 +368,11 @@ class TestServerUpgrade:
             settings_mod.server_api_keys = old_keys
 
     def test_server_delete_no_auth(self):
-        from skillforge.registry.server import app
-        from skillforge.config import settings as settings_mod
         from fastapi.testclient import TestClient
+
+        from skillforge.config import settings as settings_mod
+        from skillforge.registry.server import app
+
         old_keys = settings_mod.server_api_keys
         settings_mod.server_api_keys = ["test-key"]
         try:
@@ -326,7 +386,9 @@ class TestServerUpgrade:
 class TestPublishCLI:
     def test_publish_help(self):
         from typer.testing import CliRunner
+
         from skillforge.cli.main import app
+
         runner = CliRunner()
         result = runner.invoke(app, ["registry", "publish", "--help"])
         assert result.exit_code == 0
@@ -334,21 +396,27 @@ class TestPublishCLI:
 
     def test_login_help(self):
         from typer.testing import CliRunner
+
         from skillforge.cli.main import app
+
         runner = CliRunner()
         result = runner.invoke(app, ["registry", "login", "--help"])
         assert result.exit_code == 0
 
     def test_publish_no_path(self):
         from typer.testing import CliRunner
+
         from skillforge.cli.main import app
+
         runner = CliRunner()
         result = runner.invoke(app, ["registry", "publish"])
         assert result.exit_code != 0
 
     def test_community_discover_help(self):
         from typer.testing import CliRunner
+
         from skillforge.cli.main import app
+
         runner = CliRunner()
         result = runner.invoke(app, ["registry", "community", "--help"])
         assert result.exit_code == 0
@@ -358,7 +426,9 @@ class TestPublishCLI:
 class TestOpenAPICLI:
     def test_openapi_help(self):
         from typer.testing import CliRunner
+
         from skillforge.cli.main import app
+
         runner = CliRunner()
         result = runner.invoke(app, ["skill", "openapi", "--help"])
         assert result.exit_code == 0
@@ -366,16 +436,35 @@ class TestOpenAPICLI:
     def test_openapi_with_manifest_path(self):
         with tempfile.TemporaryDirectory() as td:
             manifest_path = Path(td) / "skill.yaml"
-            manifest_path.write_text(yaml.dump({
-                "name": "cli-openapi-test",
-                "version": "1.0.0",
-                "description": "CLI OpenAPI test",
-                "inputs": [{"name": "x", "type": "integer", "description": "Input value", "required": True}],
-                "outputs": [{"name": "y", "type": "integer", "description": "Output value"}],
-                "execution": {"mode": "direct", "entrypoint": "skill.py", "function": "run"},
-            }))
+            manifest_path.write_text(
+                yaml.dump(
+                    {
+                        "name": "cli-openapi-test",
+                        "version": "1.0.0",
+                        "description": "CLI OpenAPI test",
+                        "inputs": [
+                            {
+                                "name": "x",
+                                "type": "integer",
+                                "description": "Input value",
+                                "required": True,
+                            }
+                        ],
+                        "outputs": [
+                            {"name": "y", "type": "integer", "description": "Output value"}
+                        ],
+                        "execution": {
+                            "mode": "direct",
+                            "entrypoint": "skill.py",
+                            "function": "run",
+                        },
+                    }
+                )
+            )
             from typer.testing import CliRunner
+
             from skillforge.cli.main import app
+
             runner = CliRunner()
             result = runner.invoke(app, ["skill", "openapi", str(manifest_path)])
             assert result.exit_code == 0
@@ -384,15 +473,23 @@ class TestOpenAPICLI:
     def test_openapi_json_format(self):
         with tempfile.TemporaryDirectory() as td:
             manifest_path = Path(td) / "skill.yaml"
-            manifest_path.write_text(yaml.dump({
-                "name": "json-test",
-                "version": "0.1.0",
-                "execution": {"mode": "direct"},
-            }))
+            manifest_path.write_text(
+                yaml.dump(
+                    {
+                        "name": "json-test",
+                        "version": "0.1.0",
+                        "execution": {"mode": "direct"},
+                    }
+                )
+            )
             from typer.testing import CliRunner
+
             from skillforge.cli.main import app
+
             runner = CliRunner()
-            result = runner.invoke(app, ["skill", "openapi", str(manifest_path), "--format", "json"])
+            result = runner.invoke(
+                app, ["skill", "openapi", str(manifest_path), "--format", "json"]
+            )
             assert result.exit_code == 0
             data = json.loads(result.stdout)
             assert data["openapi"] == "3.0.3"
@@ -400,50 +497,72 @@ class TestOpenAPICLI:
     def test_openapi_with_output_file(self):
         with tempfile.TemporaryDirectory() as td:
             manifest_path = Path(td) / "skill.yaml"
-            manifest_path.write_text(yaml.dump({
-                "name": "output-test",
-                "version": "0.1.0",
-                "execution": {"mode": "direct"},
-            }))
+            manifest_path.write_text(
+                yaml.dump(
+                    {
+                        "name": "output-test",
+                        "version": "0.1.0",
+                        "execution": {"mode": "direct"},
+                    }
+                )
+            )
             output_path = Path(td) / "spec.yaml"
             from typer.testing import CliRunner
+
             from skillforge.cli.main import app
+
             runner = CliRunner()
-            result = runner.invoke(app, [
-                "skill", "openapi", str(manifest_path),
-                "--output", str(output_path),
-            ])
+            result = runner.invoke(
+                app,
+                [
+                    "skill",
+                    "openapi",
+                    str(manifest_path),
+                    "--output",
+                    str(output_path),
+                ],
+            )
             assert result.exit_code == 0
             assert output_path.exists()
             content = output_path.read_text()
             assert "openapi: 3.0.3" in content
 
     def test_openapi_from_installed_skill(self):
+        import uuid
+
+        skill_name = f"installed-openapi-{uuid.uuid4().hex[:8]}"
         with tempfile.TemporaryDirectory() as td:
-            skill_dir = Path(td) / "installed-test"
+            skill_dir = Path(td) / skill_name
             skill_dir.mkdir()
             manifest = {
-                "name": "installed-openapi",
+                "name": skill_name,
                 "version": "1.0.0",
                 "description": "Installed OpenAPI test",
-                "inputs": [{"name": "inp", "type": "string", "description": "Input", "required": True}],
+                "inputs": [
+                    {"name": "inp", "type": "string", "description": "Input", "required": True}
+                ],
                 "outputs": [{"name": "out", "type": "string", "description": "Output"}],
                 "execution": {"mode": "direct", "entrypoint": "skill.py", "function": "run"},
             }
             (skill_dir / "skill.yaml").write_text(yaml.dump(manifest))
-            (skill_dir / "skill.py").write_text("def run(inp: str) -> dict:\n    return {'out': inp}")
+            (skill_dir / "skill.py").write_text(
+                "def run(inp: str) -> dict:\n    return {'out': inp}"
+            )
 
             reg = LocalRegistry()
             from skillforge.registry.installer import Installer
+
             installer = Installer()
             installer.install_from_path(skill_dir)
             reg.close()
 
             from typer.testing import CliRunner
-            from skillforge.cli.main import app
-            runner = CliRunner()
-            result = runner.invoke(app, ["skill", "openapi", "installed-openapi"])
-            assert result.exit_code == 0
-            assert "installed-openapi" in result.stdout
 
-            installer.remove("installed-openapi")
+            from skillforge.cli.main import app
+
+            runner = CliRunner()
+            result = runner.invoke(app, ["skill", "openapi", skill_name])
+            assert result.exit_code == 0
+            assert skill_name in result.stdout
+
+            installer.remove(skill_name)

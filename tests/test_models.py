@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from skillforge.models.skill import SkillInput, SkillManifest
 from skillforge.models.execution import ExecutionRequest, ExecutionResult, ExecutionStatus
 from skillforge.models.registry import RegistryEntry, SearchQuery
+from skillforge.models.skill import SkillInput, SkillManifest
 
 
 class TestSkillManifest:
@@ -14,11 +14,13 @@ class TestSkillManifest:
 
     def test_invalid_semver(self):
         import pytest
+
         with pytest.raises(Exception):
             SkillManifest(name="test", version="not-a-version")
 
     def test_invalid_name(self):
         import pytest
+
         with pytest.raises(Exception):
             SkillManifest(name="", version="1.0.0")
         with pytest.raises(Exception):

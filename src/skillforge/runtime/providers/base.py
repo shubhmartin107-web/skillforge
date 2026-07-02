@@ -14,8 +14,7 @@ class BaseProvider(ABC):
         temperature: float = 0.7,
         max_tokens: int = 1024,
         **kwargs: Any,
-    ) -> dict[str, Any]:
-        ...
+    ) -> dict[str, Any]: ...
 
     @abstractmethod
     def generate(
@@ -24,8 +23,7 @@ class BaseProvider(ABC):
         temperature: float = 0.7,
         max_tokens: int = 1024,
         **kwargs: Any,
-    ) -> str:
-        ...
+    ) -> str: ...
 
     def stream_chat(
         self,
@@ -36,7 +34,9 @@ class BaseProvider(ABC):
     ):
         raise NotImplementedError(f"{self.name} does not support streaming")
 
-    def to_tool_json(self, skill_name: str, description: str, parameters: dict[str, Any]) -> dict[str, Any]:
+    def to_tool_json(
+        self, skill_name: str, description: str, parameters: dict[str, Any]
+    ) -> dict[str, Any]:
         return {
             "type": "function",
             "function": {

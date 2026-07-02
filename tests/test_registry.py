@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 from skillforge.models.registry import SearchQuery
 
 
@@ -26,12 +24,14 @@ class TestLocalRegistry:
         from skillforge.models.registry import RegistryEntry
 
         for i in range(3):
-            registry.install(RegistryEntry(
-                name=f"skill-{i}",
-                version=f"1.{i}.0",
-                description=f"Test skill {i}",
-                tags=["test"],
-            ))
+            registry.install(
+                RegistryEntry(
+                    name=f"skill-{i}",
+                    version=f"1.{i}.0",
+                    description=f"Test skill {i}",
+                    tags=["test"],
+                )
+            )
 
         result = registry.search(SearchQuery(query="skill"))
         assert result.total == 3
@@ -41,6 +41,7 @@ class TestLocalRegistry:
 
     def test_remove(self, registry):
         from skillforge.models.registry import RegistryEntry
+
         registry.install(RegistryEntry(name="temp", version="1.0.0"))
         assert registry.get("temp") is not None
         registry.remove("temp")
@@ -48,6 +49,7 @@ class TestLocalRegistry:
 
     def test_stats(self, registry):
         from skillforge.models.registry import RegistryEntry
+
         registry.install(RegistryEntry(name="a", version="1.0.0", tags=["x"]))
         registry.install(RegistryEntry(name="b", version="1.0.0", tags=["y"]))
 

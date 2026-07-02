@@ -42,7 +42,8 @@ def show_version():
 @app.command("install-completions")
 def install_completions(
     shell: str = typer.Argument(
-        ..., help="Shell type",
+        ...,
+        help="Shell type",
         autocompletion=lambda: ["bash", "zsh", "fish", "powershell"],
     ),
 ):
@@ -50,9 +51,19 @@ def install_completions(
     import sys
 
     try:
-        result = subprocess.run(
-            [sys.executable, "-m", "typer", "skillforge.cli.main", "utils", "completion", "install"],
-            capture_output=True, text=True, env={**__import__("os").environ, "_TYPER_COMPLETE_INSTALL": shell},
+        subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "typer",
+                "skillforge.cli.main",
+                "utils",
+                "completion",
+                "install",
+            ],
+            capture_output=True,
+            text=True,
+            env={**__import__("os").environ, "_TYPER_COMPLETE_INSTALL": shell},
         )
         console.print(f"[green]Tab completion installed for {shell}[/green]")
         console.print(f"Restart your shell or run: [bold]source ~/.{shell}rc[/bold]")
@@ -85,6 +96,7 @@ def install_builtins():
 def dashboard():
     try:
         from skillforge.dashboard.app import run_dashboard
+
         console.print("[green]Starting SkillForge Dashboard...[/green]")
         console.print("[dim]Open http://127.0.0.1:7860 in your browser[/dim]")
         run_dashboard()
@@ -97,6 +109,7 @@ def dashboard():
 @app.command("init")
 def init_project():
     from skillforge.config import settings
+
     settings.ensure_dirs()
     console.print("[green]✓ SkillForge initialized[/green]")
     console.print(f"  Home: [cyan]{settings.skillforge_home}[/cyan]")
@@ -108,20 +121,22 @@ def init_project():
 
 def _show_banner():
     console.print()
-    console.print(Panel.fit(
-        "[bold cyan]⚒  SkillForge[/bold cyan]  [dim]v" + __version__ + "[/dim]\n"
-        "[dim]Reusable Agent Skills Registry & Runtime[/dim]\n\n"
-        "[bold]Quick Commands:[/bold]\n"
-        "  [green]skillforge init[/green]              Initialize and install built-in skills\n"
-        "  [green]skillforge skill create[/green]       Scaffold a new skill\n"
-        "  [green]skillforge registry list[/green]      List installed skills\n"
-        "  [green]skillforge skill run[/green]           Execute a skill\n"
-        "  [green]skillforge workflow run[/green]        Run a workflow\n"
-        "  [green]skillforge dashboard[/green]           Launch the web dashboard\n\n"
-        "[dim]Run [bold]skillforge --help[/bold] for all commands[/dim]",
-        title="SkillForge",
-        border_style="cyan",
-    ))
+    console.print(
+        Panel.fit(
+            "[bold cyan]⚒  SkillForge[/bold cyan]  [dim]v" + __version__ + "[/dim]\n"
+            "[dim]Reusable Agent Skills Registry & Runtime[/dim]\n\n"
+            "[bold]Quick Commands:[/bold]\n"
+            "  [green]skillforge init[/green]              Initialize and install built-in skills\n"
+            "  [green]skillforge skill create[/green]       Scaffold a new skill\n"
+            "  [green]skillforge registry list[/green]      List installed skills\n"
+            "  [green]skillforge skill run[/green]           Execute a skill\n"
+            "  [green]skillforge workflow run[/green]        Run a workflow\n"
+            "  [green]skillforge dashboard[/green]           Launch the web dashboard\n\n"
+            "[dim]Run [bold]skillforge --help[/bold] for all commands[/dim]",
+            title="SkillForge",
+            border_style="cyan",
+        )
+    )
 
 
 if __name__ == "__main__":

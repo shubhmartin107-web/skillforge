@@ -1,19 +1,19 @@
 from __future__ import annotations
 
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
 
 
-class ExecutionMode(str, Enum):
+class ExecutionMode(StrEnum):
     direct = "direct"
     tool_calling = "tool_calling"
     sub_agent = "sub_agent"
 
 
-class ExecutionStatus(str, Enum):
+class ExecutionStatus(StrEnum):
     pending = "pending"
     running = "running"
     completed = "completed"

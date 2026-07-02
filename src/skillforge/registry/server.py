@@ -177,7 +177,7 @@ def track_download(name: str, version: str | None = Query(None)):
 @app.post("/api/v1/skills/publish")
 async def publish_skill(
     manifest: str = Form(...),
-    files: list[UploadFile] = File(...),
+    files: list[UploadFile] = File(...),  # noqa: B008
 ):
     data = yaml.safe_load(manifest)
     if not isinstance(data, dict):
@@ -189,7 +189,8 @@ async def publish_skill(
 
     for file in files:
         content = await file.read()
-        file_path = skill_dir / file.filename
+        filename = file.filename or "unknown"
+        file_path = skill_dir / filename
         file_path.parent.mkdir(parents=True, exist_ok=True)
         file_path.write_bytes(content)
 
@@ -244,6 +245,7 @@ def delete_skill(name: str):
     skill_dir = Path(entry.skill_path)
     if skill_dir.exists():
         import shutil
+
         shutil.rmtree(skill_dir)
 
     parent = skill_dir.parent

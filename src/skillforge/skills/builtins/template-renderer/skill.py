@@ -1,7 +1,9 @@
 import re
 
 
-def render_template(template: str, variables: dict | None = None, missing_placeholder: str = "keep") -> dict:
+def render_template(
+    template: str, variables: dict | None = None, missing_placeholder: str = "keep"
+) -> dict:
     variables = variables or {}
     pattern = r"\{(\w+)\}"
     placeholders = re.findall(pattern, template)

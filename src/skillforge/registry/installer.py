@@ -115,10 +115,7 @@ class Installer:
 
     def _parse_manifest(self, path: Path) -> SkillManifest:
         content = path.read_text("utf-8")
-        if path.suffix == ".json":
-            data = json.loads(content)
-        else:
-            data = yaml.safe_load(content)
+        data = json.loads(content) if path.suffix == ".json" else yaml.safe_load(content)
         if not isinstance(data, dict):
             raise InstallError("Invalid manifest format")
         return SkillManifest.from_yaml_dict(data)

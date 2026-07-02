@@ -5,7 +5,12 @@ def read_file(path: str, encoding: str = "utf-8", max_bytes: int = 1048576) -> d
     file_path = Path(path).resolve()
 
     if not file_path.exists():
-        return {"error": f"File not found: {path}", "content": "", "size_bytes": 0, "truncated": False}
+        return {
+            "error": f"File not found: {path}",
+            "content": "",
+            "size_bytes": 0,
+            "truncated": False,
+        }
     if not file_path.is_file():
         return {"error": f"Not a file: {path}", "content": "", "size_bytes": 0, "truncated": False}
 

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from pathlib import Path
-
+from skillforge.models.skill import Permission
 from skillforge.security.permissions import (
     IntegrityError,
     PermissionError,
@@ -10,7 +9,6 @@ from skillforge.security.permissions import (
     verify_against_checksums,
     verify_skill_integrity,
 )
-from skillforge.models.skill import Permission
 
 
 class TestPermissionValidatorExtended:
@@ -25,6 +23,7 @@ class TestPermissionValidatorExtended:
     def test_validate_all_fails(self):
         p = PermissionValidator(Permission())
         import pytest
+
         with pytest.raises(PermissionError):
             p.validate_all({"network": True})
 
@@ -39,6 +38,7 @@ class TestPermissionValidatorExtended:
     def test_file_write_denied(self):
         p = PermissionValidator(Permission(filesystem_write=[]))
         import pytest
+
         with pytest.raises(PermissionError):
             p.check_file_write("/tmp/test.txt")
 
@@ -68,6 +68,7 @@ class TestSkillIntegrity:
         (tmp_path / "skill.py").write_text("def run(): return {}\n")
 
         import pytest
+
         with pytest.raises(IntegrityError):
             verify_against_checksums(tmp_path, hashes)
 

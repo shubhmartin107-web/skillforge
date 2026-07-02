@@ -48,6 +48,7 @@ class Executor:
             manifest_path = Path(entry.manifest_path)
             if manifest_path.exists():
                 import yaml
+
                 raw = yaml.safe_load(manifest_path.read_text("utf-8"))
                 manifest = SkillManifest.from_yaml_dict(raw)
             else:
@@ -175,9 +176,14 @@ class Executor:
                 raise ValueError(f"Skill directory not found: {skill_dir}")
 
             import yaml
+
             manifest_path = Path(entry.manifest_path)
             raw = yaml.safe_load(manifest_path.read_text("utf-8")) if manifest_path.exists() else {}
-            manifest = SkillManifest.from_yaml_dict(raw) if raw else SkillManifest(name=entry.name, version=entry.version)
+            manifest = (
+                SkillManifest.from_yaml_dict(raw)
+                if raw
+                else SkillManifest(name=entry.name, version=entry.version)
+            )
             permissions = manifest.permissions
 
             hooks.start(skill_name=request.skill_name, mode="sandboxed")
@@ -198,7 +204,9 @@ class Executor:
 
                 code = entry_path.read_text("utf-8")
                 func_name = manifest.execution.get("function", "run") if manifest else "run"
-                outputs = sandbox.execute_python(code, function_name=func_name, inputs=request.inputs)
+                outputs = sandbox.execute_python(
+                    code, function_name=func_name, inputs=request.inputs
+                )
 
             result.outputs = outputs
             result.status = ExecutionStatus.completed

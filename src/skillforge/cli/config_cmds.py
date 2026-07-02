@@ -22,8 +22,12 @@ def show_config():
     console.print(f"  [bold]Default Runtime:[/bold] {settings.default_runtime}")
     console.print(f"  [bold]Execution Timeout:[/bold] {settings.execution_timeout}s")
     console.print(f"  [bold]Max Memory:[/bold] {settings.max_memory_mb}MB")
-    console.print(f"  [bold]DeepSeek API Key:[/bold] {'***' if settings.deepseek_api_key else 'Not set'}")
-    console.print(f"  [bold]Gemini API Key:[/bold] {'***' if settings.gemini_api_key else 'Not set'}")
+    console.print(
+        f"  [bold]DeepSeek API Key:[/bold] {'***' if settings.deepseek_api_key else 'Not set'}"
+    )
+    console.print(
+        f"  [bold]Gemini API Key:[/bold] {'***' if settings.gemini_api_key else 'Not set'}"
+    )
     console.print(f"  [bold]Groq API Key:[/bold] {'***' if settings.groq_api_key else 'Not set'}")
     console.print(f"  [bold]Ollama Base URL:[/bold] {settings.ollama_base_url}")
 

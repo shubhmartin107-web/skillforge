@@ -134,9 +134,12 @@ warn_redundant_casts = true
 warn_unused_configs = true
 disallow_untyped_defs = false
 disallow_any_unimported = false
+exclude = [
+    "src/skillforge/skills/builtins/",
+]
 
 [[tool.mypy.overrides]]
-module = ["tests.*"]
+module = ["tests*"]
 ignore_errors = true
 
 [tool.pytest.ini_options]

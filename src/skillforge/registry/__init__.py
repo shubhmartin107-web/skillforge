@@ -5,6 +5,10 @@ from skillforge.registry.remote import RemoteRegistry
 from skillforge.registry.resolver import DependencyResolver
 
 __all__ = [
-    "LocalRegistry", "RemoteRegistry", "DependencyResolver", "Installer",
-    "CommunityRegistry", "CommunitySkill",
+    "LocalRegistry",
+    "RemoteRegistry",
+    "DependencyResolver",
+    "Installer",
+    "CommunityRegistry",
+    "CommunitySkill",
 ]
