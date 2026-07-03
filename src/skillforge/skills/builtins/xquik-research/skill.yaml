@@ -1,0 +1,50 @@
+name: xquik-research
+version: 1.0.0
+description: "Queries the Xquik REST API for X/Twitter research workflows"
+
+author:
+  name: "SkillForge Builtins"
+
+inputs:
+  - name: endpoint
+    type: string
+    description: "API path to request, such as /api/v1/x/tweets/search"
+    required: true
+  - name: api_key
+    type: string
+    description: "Xquik API key"
+    required: true
+  - name: query
+    type: object
+    description: "Query parameters to send with the request"
+    default: {}
+  - name: timeout
+    type: integer
+    description: "Request timeout in seconds"
+    default: 30
+
+outputs:
+  - name: status_code
+    type: integer
+    description: "HTTP status code"
+  - name: data
+    type: object
+    description: "Parsed JSON response when available"
+  - name: body
+    type: string
+    description: "Raw response body when JSON parsing fails"
+  - name: elapsed_ms
+    type: integer
+    description: "Request duration in milliseconds"
+
+permissions:
+  network: true
+  env_vars: []
+
+execution:
+  mode: direct
+  entrypoint: skill.py
+  function: query_xquik
+
+tags: ["xquik", "twitter", "x", "research", "api", "builtin"]
+categories: ["data-ingestion", "research"]
