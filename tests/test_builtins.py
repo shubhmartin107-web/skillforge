@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.util
 from pathlib import Path
 
 from skillforge.models.execution import ExecutionRequest
@@ -173,3 +174,57 @@ class TestBuiltinJSON:
         )
         assert result.success
         assert result.outputs["valid"] is False
+
+
+class TestBuiltinXquikResearch:
+    def test_success_result_shape(self, monkeypatch):
+        skill_path = (
+            Path(__file__).parent.parent
+            / "src"
+            / "skillforge"
+            / "skills"
+            / "builtins"
+            / "xquik-research"
+            / "skill.py"
+        )
+        spec = importlib.util.spec_from_file_location("xquik_research_skill", skill_path)
+        assert spec is not None
+        assert spec.loader is not None
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        class FakeResponse:
+            status_code = 200
+            text = '{"ok": true}'
+
+            def json(self):
+                return {"ok": True}
+
+        class FakeClient:
+            def __init__(self, **kwargs):
+                self.kwargs = kwargs
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return None
+
+            def get(self, url, params, headers):
+                assert url == "https://xquik.com/api/v1/x/tweets/search"
+                assert params == {"q": "xquik"}
+                assert headers["X-API-Key"] == "test-key"
+                return FakeResponse()
+
+        monkeypatch.setattr(module.httpx, "Client", FakeClient)
+
+        result = module.query_xquik(
+            endpoint="/api/v1/x/tweets/search",
+            api_key="test-key",
+            query={"q": "xquik"},
+        )
+
+        assert result["status_code"] == 200
+        assert result["data"] == {"ok": True}
+        assert result["body"] == ""
+        assert isinstance(result["elapsed_ms"], int)
